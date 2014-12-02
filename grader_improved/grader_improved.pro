@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     grader_setup.cpp \
     grader_editor.cpp \
     grader_settings.cpp \
-    grader_shortcuts.cpp
+    grader_shortcuts.cpp \
+    latex_highlight.cpp
 
 HEADERS  += mainwindow.h \
     grader_setup.h \
     grader_editor.h \
     grader_settings.h \
-    grader_shortcuts.h
+    grader_shortcuts.h \
+    latex_highlight.h
 
 FORMS    += mainwindow.ui \
     grader_setup.ui \

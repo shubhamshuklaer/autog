@@ -53,6 +53,14 @@
      <height>0</height>
     </size>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+   </property>
    <property name="text">
     <string>&amp;Start</string>
    </property>
@@ -72,6 +80,14 @@
      <height>0</height>
     </size>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+   </property>
    <property name="text">
     <string>Choose Subfil&amp;e</string>
    </property>
@@ -90,6 +106,14 @@
      <width>0</width>
      <height>0</height>
     </size>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
    </property>
    <property name="text">
     <string>Choose &amp;Out Folder</string>
@@ -201,6 +225,14 @@
      <height>0</height>
     </size>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+   </property>
    <property name="text">
     <string>Choose &amp;Burst Folder</string>
    </property>
@@ -244,6 +276,14 @@
      <width>0</width>
      <height>0</height>
     </size>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
    </property>
    <property name="text">
     <string>Choose &amp;Preamble</string>
@@ -300,6 +340,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>choose_folder_btn</tabstop>
+  <tabstop>choose_top_btn</tabstop>
+  <tabstop>choose_subfile_btn</tabstop>
+  <tabstop>choose_out_folder_btn</tabstop>
+  <tabstop>setup_output_btn</tabstop>
+  <tabstop>burst_folder_name</tabstop>
+  <tabstop>top_tex_name</tabstop>
+  <tabstop>sub_tex_name</tabstop>
+  <tabstop>out_folder_name</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
