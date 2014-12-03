@@ -33,7 +33,7 @@ void MainWindow::setup_done(){
     this->out_dir_name=this->grader_setup_widget->out_dir_name;
     this->filesList=this->grader_setup_widget->filesList;
     delete this->grader_setup_widget;
-    this->grader_editor_widget=new grader_editor(this,this->filesList);
+    this->grader_editor_widget=new grader_editor(this,this->filesList,this->out_dir_name);
     this->grader_editor_widget->show();
     this->ui->centralWidget->setFixedSize(this->grader_editor_widget->size());
 }
