@@ -294,6 +294,7 @@ void grader_editor::preview_thread_func_comment_pos(QString comment_pos){
 
 QString grader_editor::escape_string(QString comment){
     comment.replace("\\","\\\\");
+    comment.replace("&","\\&");
     QString temp="[\\n\\t\\r]";
     qDebug() <<temp;
     comment.replace(temp,"+");

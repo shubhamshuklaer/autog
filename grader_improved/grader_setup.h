@@ -26,6 +26,9 @@ private slots:
     void choose_subfile(void);
     void choose_out_folder(void);
     void setup_output(void);
+
+    void on_start_new_btn_clicked();
+
 private:
     Ui::grader_setup *ui;
 };
