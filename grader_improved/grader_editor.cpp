@@ -2,6 +2,7 @@
 #include "ui_grader_editor.h"
 #include <QProcess>
 #include <QDebug>
+#include <QtConcurrent/QtConcurrent>
 
 grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name) :
     QWidget(parent),
@@ -101,6 +102,7 @@ void grader_editor::on_file_name_combo_activated(int index)
 }
 
 
+
 QString grader_editor::get_marks(QString file_name){
     QProcess process;
     process.setWorkingDirectory(this->out_dir_name+"/subfiles");
@@ -157,12 +159,33 @@ void grader_editor::put_comment(QString file_name, QString comment){
     process.start("cp", QStringList() << file_name+".tex" << "temp2.tex" );
     process.waitForFinished(-1);
     comment=comment.simplified();
-    QString temp="s:\\\\putcomment\\\[\\\(.\\\)\\\]{.*:\\\\putcomment\\\[\\1]{"+comment+"}:";
+    QString temp="s:\\\\putcomment\\\[.]{.*:\\\\putcomment\\\["+this->ui->comment_pos_combo->currentText()+"]{"+comment+"}:";
 //    qDebug()<<temp;
     process.setStandardInputFile(this->out_dir_name+"/subfiles/temp2.tex");
     process.setStandardOutputFile(this->out_dir_name+"/subfiles/"+file_name+".tex",QIODevice::Truncate);
     process.start("sed",QStringList() << temp);
     process.waitForFinished(-1);
+    process.kill();
+    QProcess process1;
+    process1.setWorkingDirectory(this->out_dir_name+"/subfiles");
+    process1.start("rm temp2.tex");
+    process1.waitForFinished(-1);
+    this->file_mutex.unlock();
+}
+
+void grader_editor::put_comment_pos(QString file_name, QString comment_pos){
+    QProcess process;
+    process.setWorkingDirectory(this->out_dir_name+"/subfiles");
+    this->file_mutex.lock();
+    process.start("cp", QStringList() << file_name+".tex" << "temp2.tex" );
+    process.waitForFinished(-1);
+    QString temp="s:\\\\putcomment\\\[.]{\\(.*\\)}:\\\\putcomment\\\["+comment_pos+"]{\\1}:";
+//    qDebug()<<temp;
+    process.setStandardInputFile(this->out_dir_name+"/subfiles/temp2.tex");
+    process.setStandardOutputFile(this->out_dir_name+"/subfiles/"+file_name+".tex",QIODevice::Truncate);
+    process.start("sed",QStringList() << temp);
+    process.waitForFinished(-1);
+//    qDebug() <<process.readAllStandardError();
     process.kill();
     QProcess process1;
     process1.setWorkingDirectory(this->out_dir_name+"/subfiles");
@@ -208,6 +231,62 @@ void grader_editor::include_only(bool is_include_only){
     process2.start("rm temp_pdf.tex");
     process2.waitForFinished(-1);
     this->main_file_mutex.unlock();
+}
+
+
+
+void grader_editor::on_marks_text_textChanged(const QString &arg1)
+{
+    this->future=QtConcurrent::run(this, &grader_editor::preview_thread_func_marks);
+}
+
+void grader_editor::on_comment_text_textChanged()
+{
+    this->future=QtConcurrent::run(this, &grader_editor::preview_thread_func_comment);
+}
+
+void grader_editor::on_comment_pos_combo_activated(int index)
+{
+    this->future=QtConcurrent::run(this, &grader_editor::preview_thread_func_comment_pos,this->ui->comment_pos_combo->currentText());
+}
+
+void grader_editor::preview_thread_func_marks(){
+    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    include_only(true);
+    QProcess process;
+    process.setWorkingDirectory(this->out_dir_name);
+    this->tex_mutex.lock();
+    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.waitForFinished(-1);
+    this->tex_mutex.unlock();
+//    process.start("gnome-open", QStringList() << "main_pdf.pdf");
+//    process.waitForFinished(-1);
+}
+
+
+
+void grader_editor::preview_thread_func_comment(){
+    put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
+    include_only(true);
+    QProcess process;
+    process.setWorkingDirectory(out_dir_name);
+    this->tex_mutex.lock();
+    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.waitForFinished(-1);
+    this->tex_mutex.unlock();
+//    process.start("gnome-open", QStringList() << "main_pdf.pdf");
+//    process.waitForFinished(-1);
+}
+
+void grader_editor::preview_thread_func_comment_pos(QString comment_pos){
+    put_comment_pos(this->filesList[this->current_index],comment_pos);
+    include_only(true);
+    QProcess process;
+    process.setWorkingDirectory(out_dir_name);
+    this->tex_mutex.lock();
+    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.waitForFinished(-1);
+    this->tex_mutex.unlock();
 }
 
 

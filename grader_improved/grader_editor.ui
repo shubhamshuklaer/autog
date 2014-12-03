@@ -6,45 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
-    <height>291</height>
+    <width>459</width>
+    <height>214</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="preview_btn">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>200</y>
-     <width>181</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-   </property>
-   <property name="text">
-    <string>Previe&amp;w</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>20</y>
+     <x>10</x>
+     <y>10</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -68,48 +47,21 @@
   <widget class="QTextEdit" name="comment_text">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>100</y>
-     <width>411</width>
-     <height>89</height>
+     <x>100</x>
+     <y>90</y>
+     <width>351</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="tabChangesFocus">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="next_btn">
-   <property name="geometry">
-    <rect>
-     <x>480</x>
-     <y>220</y>
-     <width>91</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-   </property>
-   <property name="text">
-    <string>&amp;Next</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>48</x>
-     <y>60</y>
+     <x>8</x>
+     <y>50</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -133,8 +85,8 @@
   <widget class="QLineEdit" name="marks_text">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>60</y>
+     <x>100</x>
+     <y>50</y>
      <width>71</width>
      <height>25</height>
     </rect>
@@ -146,38 +98,11 @@
     </size>
    </property>
   </widget>
-  <widget class="QPushButton" name="prev_btn">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>220</y>
-     <width>91</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-   </property>
-   <property name="text">
-    <string>&amp;Previous</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>100</y>
+     <x>10</x>
+     <y>90</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -201,9 +126,9 @@
   <widget class="QWidget" name="marks_widget" native="true">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>50</y>
-     <width>321</width>
+     <x>190</x>
+     <y>40</y>
+     <width>261</width>
      <height>41</height>
     </rect>
    </property>
@@ -263,9 +188,9 @@
   <widget class="QComboBox" name="file_name_combo">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>20</y>
-     <width>411</width>
+     <x>100</x>
+     <y>10</y>
+     <width>351</width>
      <height>27</height>
     </rect>
    </property>
@@ -282,32 +207,11 @@ border-color: rgb(240, 119, 70);
     <enum>QComboBox::NoInsert</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="gen_pdf_btn">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>240</y>
-     <width>181</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-   </property>
-   <property name="text">
-    <string>&amp;Generate Pdf</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comment_pos_combo">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>130</y>
+     <x>10</x>
+     <y>120</y>
      <width>71</width>
      <height>27</height>
     </rect>
@@ -340,6 +244,96 @@ border-color: rgb(240, 119, 70);
      <string>b</string>
     </property>
    </item>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>180</y>
+     <width>441</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="prev_btn">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+      </property>
+      <property name="text">
+       <string>&amp;Previous</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="preview_btn">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+      </property>
+      <property name="text">
+       <string>Previe&amp;w</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="gen_pdf_btn">
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+      </property>
+      <property name="text">
+       <string>&amp;Generate Pdf</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="next_btn">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+      </property>
+      <property name="text">
+       <string>&amp;Next</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <tabstops>

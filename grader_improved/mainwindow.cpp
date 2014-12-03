@@ -35,5 +35,6 @@ void MainWindow::setup_done(){
     delete this->grader_setup_widget;
     this->grader_editor_widget=new grader_editor(this,this->filesList,this->out_dir_name);
     this->grader_editor_widget->show();
-    this->ui->centralWidget->setFixedSize(this->grader_editor_widget->size());
+    this->setFixedWidth(this->grader_editor_widget->size().width());
+    this->setFixedHeight(this->grader_editor_widget->size().height());
 }

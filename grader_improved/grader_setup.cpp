@@ -87,10 +87,10 @@ void grader_setup::setup_output(){
         }
         for(int i=0;i<this->filesList.length();i++){
             QString temp="bash -c \"if \[ ! -f "+this->filesList[i]+".tex \]; then cp "+this->sub_tex_name+" "+filesList[i]+".tex; fi;\"";
-            qDebug() <<temp;
+//            qDebug() <<temp;
             process.start(temp);
             process.waitForFinished(-1);
-            qDebug() <<process.readAllStandardError();
+//            qDebug() <<process.readAllStandardError();
         }
         process.setWorkingDirectory(this->out_dir_name);
         process.start("cp",QStringList() << this->top_tex_name << "main_pdf.tex");
