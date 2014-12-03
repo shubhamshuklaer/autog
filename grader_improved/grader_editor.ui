@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
+    <width>406</width>
     <height>214</height>
    </rect>
   </property>
@@ -47,14 +47,17 @@
   <widget class="QTextEdit" name="comment_text">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>90</x>
      <y>90</y>
-     <width>351</width>
+     <width>311</width>
      <height>81</height>
     </rect>
    </property>
    <property name="tabChangesFocus">
     <bool>true</bool>
+   </property>
+   <property name="acceptRichText">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -85,7 +88,7 @@
   <widget class="QLineEdit" name="marks_text">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>90</x>
      <y>50</y>
      <width>71</width>
      <height>25</height>
@@ -126,9 +129,9 @@
   <widget class="QWidget" name="marks_widget" native="true">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>40</y>
-     <width>261</width>
+     <width>241</width>
      <height>41</height>
     </rect>
    </property>
@@ -188,9 +191,9 @@
   <widget class="QComboBox" name="file_name_combo">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>90</x>
      <y>10</y>
-     <width>351</width>
+     <width>311</width>
      <height>27</height>
     </rect>
    </property>
@@ -245,12 +248,12 @@ border-color: rgb(240, 119, 70);
     </property>
    </item>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>180</y>
-     <width>441</width>
+     <width>391</width>
      <height>29</height>
     </rect>
    </property>

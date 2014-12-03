@@ -19,6 +19,7 @@ grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_d
     if(this->current_index+1>=this->filesList.length())
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
+    this->ui->marks_text->setValidator(new QDoubleValidator(this));
 }
 
 grader_editor::~grader_editor()
@@ -158,7 +159,8 @@ void grader_editor::put_comment(QString file_name, QString comment){
     this->file_mutex.lock();
     process.start("cp", QStringList() << file_name+".tex" << "temp2.tex" );
     process.waitForFinished(-1);
-    comment=comment.simplified();
+//    comment=comment.simplified();
+    comment=escape_string(comment);
     QString temp="s:\\\\putcomment\\\[.]{.*:\\\\putcomment\\\["+this->ui->comment_pos_combo->currentText()+"]{"+comment+"}:";
 //    qDebug()<<temp;
     process.setStandardInputFile(this->out_dir_name+"/subfiles/temp2.tex");
@@ -200,14 +202,14 @@ void grader_editor::include_only(bool is_include_only){
     process.setWorkingDirectory(this->out_dir_name);
     process.setStandardInputFile(this->out_dir_name+"/main_pdf.tex");
     this->main_file_mutex.lock();
-    process.start("grep",QStringList() << "\includeonly{*");
+    process.start("grep",QStringList() << "\\includeonly{.*");
     process.waitForFinished(-1);
     QProcess process1;
     process1.setWorkingDirectory(this->out_dir_name);
     process1.start("cp main_pdf.tex temp_pdf.tex");
     process1.waitForFinished(-1);
     process1.setStandardInputFile(this->out_dir_name+"/temp_pdf.tex");
-    process1.setStandardOutputFile(this->out_dir_name+"/main_pdf.tex");
+    process1.setStandardOutputFile(this->out_dir_name+"/main_pdf.tex",QIODevice::Truncate);
     QString temp;
     if(process.readAllStandardOutput()==""){
         if(is_include_only){
@@ -227,7 +229,7 @@ void grader_editor::include_only(bool is_include_only){
 
     }
     QProcess process2;
-    process.setWorkingDirectory(this->out_dir_name);
+    process2.setWorkingDirectory(this->out_dir_name);
     process2.start("rm temp_pdf.tex");
     process2.waitForFinished(-1);
     this->main_file_mutex.unlock();
@@ -290,3 +292,11 @@ void grader_editor::preview_thread_func_comment_pos(QString comment_pos){
 }
 
 
+QString grader_editor::escape_string(QString comment){
+    comment.replace("\\","\\\\");
+    QString temp="[\\n\\t\\r]";
+    qDebug() <<temp;
+    comment.replace(temp,"+");
+    qDebug() <<comment;
+    return comment;
+}

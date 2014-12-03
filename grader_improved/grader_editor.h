@@ -30,6 +30,7 @@ public:
     void preview_thread_func_marks(void);
     void preview_thread_func_comment(void);
     void preview_thread_func_comment_pos(QString comment_pos);
+    QString escape_string(QString comment);
 
 private slots:
     void on_next_btn_clicked();
