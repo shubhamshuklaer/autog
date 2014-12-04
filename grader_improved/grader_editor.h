@@ -5,6 +5,7 @@
 #include <QMutex>
 #include <QtConcurrent/QtConcurrent>
 #include <QReadWriteLock>
+#include "grader_marks_widget.h"
 
 namespace Ui {
 class grader_editor;
@@ -22,6 +23,7 @@ public:
     QString out_dir_name,sub_tex_name,tex_errors;
     QMutex file_mutex,tex_mutex,main_file_mutex;
     QReadWriteLock tex_errors_lock;
+    grader_marks_widget *marks_widget;
     QFuture<void> future;
     QString get_marks(QString file_name);
     QString get_comment(QString file_name);
@@ -45,7 +47,7 @@ private slots:
 
     void on_file_name_combo_activated(int index);
 
-    void on_marks_text_textChanged(const QString &arg1);
+    void on_marks_text_textChanged();
 
     void on_comment_text_textChanged();
 

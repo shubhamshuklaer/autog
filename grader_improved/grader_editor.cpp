@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
+#include "grader_marks_widget.h"
 
 grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name,QString sub_tex_name) :
     QWidget(parent),
@@ -16,12 +17,16 @@ grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_d
     this->sub_tex_name=sub_tex_name;
     this->ui->file_name_combo->addItems(this->filesList);
     this->ui->file_name_combo->setCurrentIndex(0);
-    this->ui->marks_text->setText(get_marks(this->filesList[0]));
+    QStringList marks_denominations=QStringList()<<"0.5"<<"0.5"<<"1"<<"2";
+    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,marks_denominations);
+//    t->show();
+    //    this->ui->marks_widget->layout()->addWidget(temp);
+    this->marks_widget->setProperty("marks",get_marks(this->filesList[0]));
     this->ui->comment_text->setText(get_comment(this->filesList[0]));
     if(this->current_index+1>=this->filesList.length())
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
-    this->ui->marks_text->setValidator(new QDoubleValidator(this));
+    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
 }
 
 grader_editor::~grader_editor()
@@ -31,34 +36,34 @@ grader_editor::~grader_editor()
 
 void grader_editor::on_next_btn_clicked()
 {
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     if(this->current_index+2==this->filesList.length())
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(true);
     this->current_index++;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    this->ui->marks_text->setText(get_marks(this->filesList[this->current_index]));
+    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 
 }
 
 void grader_editor::on_prev_btn_clicked()
 {
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     if(this->current_index<=1)
         this->ui->prev_btn->setEnabled(false);
     this->ui->next_btn->setEnabled(true);
     this->current_index--;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    this->ui->marks_text->setText(get_marks(this->filesList[this->current_index]));
+    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 }
 
 void grader_editor::on_preview_btn_clicked()
 {
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     include_only(true);
     QProcess process;
@@ -94,7 +99,7 @@ void grader_editor::on_preview_btn_clicked()
 
 void grader_editor::on_gen_pdf_btn_clicked()
 {
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     include_only(false);
     QProcess process;
@@ -130,7 +135,7 @@ void grader_editor::on_gen_pdf_btn_clicked()
 
 void grader_editor::on_file_name_combo_activated(int index)
 {
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     this->current_index=index;
     if(this->current_index==0)
@@ -141,7 +146,7 @@ void grader_editor::on_file_name_combo_activated(int index)
         this->ui->next_btn->setEnabled(false);
     else
         this->ui->next_btn->setEnabled(true);
-    this->ui->marks_text->setText(get_marks(this->filesList[this->current_index]));
+    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 
 }
@@ -179,6 +184,7 @@ QString grader_editor::get_comment(QString file_name){
 
 void grader_editor::put_marks(QString file_name, QString marks){
     QProcess process;
+    marks=marks.simplified();
     process.setWorkingDirectory(this->out_dir_name+"/subfiles");
     this->file_mutex.lock();
     process.start("cp", QStringList() << file_name+".tex" << "temp1.tex" );
@@ -281,7 +287,7 @@ void grader_editor::include_only(bool is_include_only){
 
 
 
-void grader_editor::on_marks_text_textChanged(const QString &arg1)
+void grader_editor::on_marks_text_textChanged()
 {
     this->future=QtConcurrent::run(this, &grader_editor::preview_thread_func_marks);
 }
@@ -297,7 +303,7 @@ void grader_editor::on_comment_pos_combo_activated(int index)
 }
 
 void grader_editor::preview_thread_func_marks(){
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     include_only(true);
     QProcess process;
     process.setWorkingDirectory(this->out_dir_name);
@@ -434,7 +440,7 @@ void grader_editor::on_fix_file_btn_clicked()
     process1.start("sed", QStringList() << temp1 );
     process1.waitForFinished(-1);
     process1.kill();
-    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
     include_only(true);
     QProcess process2;

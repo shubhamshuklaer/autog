@@ -18,17 +18,20 @@ SOURCES += main.cpp\
     grader_editor.cpp \
     grader_settings.cpp \
     grader_shortcuts.cpp \
-    latex_highlight.cpp
+    latex_highlight.cpp \
+    grader_marks_widget.cpp
 
 HEADERS  += mainwindow.h \
     grader_setup.h \
     grader_editor.h \
     grader_settings.h \
     grader_shortcuts.h \
-    latex_highlight.h
+    latex_highlight.h \
+    grader_marks_widget.h
 
 FORMS    += mainwindow.ui \
     grader_setup.ui \
     grader_editor.ui \
     grader_settings.ui \
-    grader_shortcuts.ui
+    grader_shortcuts.ui \
+    grader_marks_widget.ui
