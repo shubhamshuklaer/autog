@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMutex>
 #include <QtConcurrent/QtConcurrent>
+#include <QReadWriteLock>
 
 namespace Ui {
 class grader_editor;
@@ -14,12 +15,13 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QStringList filesList=QStringList(),QString out_dir_name=QString());
+    explicit grader_editor(QWidget *parent = 0,QStringList filesList=QStringList(),QString out_dir_name=QString(),QString sub_tex_name=QString());
     ~grader_editor();
     int current_index;
     QStringList filesList;
-    QString out_dir_name;
+    QString out_dir_name,sub_tex_name,tex_errors;
     QMutex file_mutex,tex_mutex,main_file_mutex;
+    QReadWriteLock tex_errors_lock;
     QFuture<void> future;
     QString get_marks(QString file_name);
     QString get_comment(QString file_name);
@@ -48,6 +50,10 @@ private slots:
     void on_comment_text_textChanged();
 
     void on_comment_pos_combo_activated(int index);
+
+    void on_fix_file_btn_clicked();
+
+    void on_see_errors_btn_clicked();
 
 private:
     Ui::grader_editor *ui;

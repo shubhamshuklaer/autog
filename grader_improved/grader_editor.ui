@@ -251,9 +251,9 @@ border-color: rgb(240, 119, 70);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>180</y>
-     <width>391</width>
+     <width>401</width>
      <height>29</height>
     </rect>
    </property>
@@ -280,6 +280,25 @@ border-color: rgb(240, 119, 70);
      </widget>
     </item>
     <item>
+     <widget class="QPushButton" name="fix_file_btn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>&amp;Fix file</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="preview_btn">
       <property name="minimumSize">
        <size>
@@ -297,21 +316,6 @@ border-color: rgb(240, 119, 70);
       </property>
       <property name="text">
        <string>Previe&amp;w</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="gen_pdf_btn">
-      <property name="focusPolicy">
-       <enum>Qt::TabFocus</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-      </property>
-      <property name="text">
-       <string>&amp;Generate Pdf</string>
       </property>
      </widget>
     </item>
@@ -338,6 +342,30 @@ border-color: rgb(240, 119, 70);
     </item>
    </layout>
   </widget>
+  <widget class="QPushButton" name="see_errors_btn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>150</y>
+     <width>81</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+   </property>
+   <property name="text">
+    <string>See &amp;Errors</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>file_name_combo</tabstop>
@@ -348,10 +376,11 @@ border-color: rgb(240, 119, 70);
   <tabstop>checkBox_4</tabstop>
   <tabstop>comment_pos_combo</tabstop>
   <tabstop>comment_text</tabstop>
-  <tabstop>prev_btn</tabstop>
+  <tabstop>see_errors_btn</tabstop>
   <tabstop>next_btn</tabstop>
+  <tabstop>prev_btn</tabstop>
+  <tabstop>fix_file_btn</tabstop>
   <tabstop>preview_btn</tabstop>
-  <tabstop>gen_pdf_btn</tabstop>
  </tabstops>
  <resources/>
  <connections/>

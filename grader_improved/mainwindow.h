@@ -19,7 +19,7 @@ public:
     grader_settings *grader_settings_widget;
     grader_editor *grader_editor_widget;
     grader_setup *grader_setup_widget;
-    QString out_dir_name;
+    QString out_dir_name,sub_tex_name;
     QStringList filesList;
 
     ~MainWindow();

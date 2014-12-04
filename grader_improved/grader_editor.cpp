@@ -3,8 +3,9 @@
 #include <QProcess>
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
+#include <QMessageBox>
 
-grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name) :
+grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name,QString sub_tex_name) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
@@ -12,6 +13,7 @@ grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_d
     this->filesList=filesList;
     this->out_dir_name=out_dir_name;
     this->current_index=0;
+    this->sub_tex_name=sub_tex_name;
     this->ui->file_name_combo->addItems(this->filesList);
     this->ui->file_name_combo->setCurrentIndex(0);
     this->ui->marks_text->setText(get_marks(this->filesList[0]));
@@ -62,9 +64,30 @@ void grader_editor::on_preview_btn_clicked()
     QProcess process;
     process.setWorkingDirectory(this->out_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
     process.start("gnome-open", QStringList() << "main_pdf.pdf");
     process.waitForFinished(-1);
 }
@@ -77,9 +100,30 @@ void grader_editor::on_gen_pdf_btn_clicked()
     QProcess process;
     process.setWorkingDirectory(this->out_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
     process.start("gnome-open", QStringList() << "main_pdf.pdf");
     process.waitForFinished(-1);
 }
@@ -258,9 +302,30 @@ void grader_editor::preview_thread_func_marks(){
     QProcess process;
     process.setWorkingDirectory(this->out_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
 //    process.start("gnome-open", QStringList() << "main_pdf.pdf");
 //    process.waitForFinished(-1);
 }
@@ -273,9 +338,30 @@ void grader_editor::preview_thread_func_comment(){
     QProcess process;
     process.setWorkingDirectory(out_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
 //    process.start("gnome-open", QStringList() << "main_pdf.pdf");
 //    process.waitForFinished(-1);
 }
@@ -286,18 +372,108 @@ void grader_editor::preview_thread_func_comment_pos(QString comment_pos){
     QProcess process;
     process.setWorkingDirectory(out_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -synctex=1 -interaction=nonstopmode main_pdf.tex");
+    process.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
 }
 
 
 QString grader_editor::escape_string(QString comment){
+    comment=comment.simplified();
     comment.replace("\\","\\\\");
     comment.replace("&","\\&");
+    comment.replace(":","\\:");
     QString temp="[\\n\\t\\r]";
     qDebug() <<temp;
     comment.replace(temp,"+");
     qDebug() <<comment;
     return comment;
+}
+
+
+
+void grader_editor::on_fix_file_btn_clicked()
+{
+    QProcess process;
+    process.setWorkingDirectory(this->out_dir_name+"/subfiles");
+    process.start("cp",QStringList()<<this->sub_tex_name<<this->filesList[this->current_index]+".tex");
+    process.waitForFinished(-1);
+    qDebug() <<process.readAllStandardError();
+    qDebug() <<this->sub_tex_name;
+    qDebug() <<this->filesList[this->current_index]+".tex";
+    //putting put page
+    QString file_id=this->filesList[this->current_index].split("_",QString::SkipEmptyParts).last();
+    QProcess process1;
+    process1.setWorkingDirectory(this->out_dir_name+"/subfiles");
+    process1.start("cp", QStringList() << this->filesList[this->current_index]+".tex" <<"temp.tex");
+    process1.waitForFinished(-1);
+    process1.setStandardInputFile(this->out_dir_name+"/subfiles/temp.tex");
+    process1.setStandardOutputFile(this->out_dir_name+"/subfiles/"+this->filesList[this->current_index]+".tex",QIODevice::Truncate);
+    QString temp1="s:\\\\putpage{.*:\\\\putpage{"+file_id+"}:";
+    process1.start("sed", QStringList() << temp1 );
+    process1.waitForFinished(-1);
+    process1.kill();
+    put_marks(this->filesList[this->current_index],this->ui->marks_text->text());
+    put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText());
+    include_only(true);
+    QProcess process2;
+    process2.setWorkingDirectory(this->out_dir_name);
+    this->tex_mutex.lock();
+    process2.start("pdflatex -file-line-error -interaction=nonstopmode main_pdf.tex");
+    process2.waitForFinished(-1);
+    this->tex_mutex.unlock();
+    QProcess tex_error_p1,tex_error_p2;
+    QString temp_tex_errors;
+    temp_tex_errors=process2.readAllStandardOutput();
+    tex_error_p1.setWorkingDirectory(this->out_dir_name);
+    tex_error_p2.setWorkingDirectory(this->out_dir_name);
+    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
+    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
+    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
+    tex_error_p1.waitForFinished(-1);
+    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
+    tex_error_p2.waitForFinished(-1);
+    this->tex_errors_lock.lockForWrite();
+    this->tex_errors=tex_error_p2.readAllStandardOutput();
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
+}
+
+void grader_editor::on_see_errors_btn_clicked()
+{
+    QString temp_tex_errors;
+    this->tex_errors_lock.lockForRead();
+    temp_tex_errors=this->tex_errors;
+    this->tex_errors_lock.unlock();
+    QMessageBox::warning(
+                this,
+                tr("Grader"),
+                temp_tex_errors );
 }

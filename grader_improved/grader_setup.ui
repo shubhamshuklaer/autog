@@ -348,8 +348,13 @@
      <height>27</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+   </property>
    <property name="text">
-    <string>start new</string>
+    <string>Start &amp;New</string>
    </property>
   </widget>
  </widget>
@@ -359,6 +364,7 @@
   <tabstop>choose_subfile_btn</tabstop>
   <tabstop>choose_out_folder_btn</tabstop>
   <tabstop>setup_output_btn</tabstop>
+  <tabstop>start_new_btn</tabstop>
   <tabstop>burst_folder_name</tabstop>
   <tabstop>top_tex_name</tabstop>
   <tabstop>sub_tex_name</tabstop>

@@ -32,8 +32,9 @@ void MainWindow::open_config_window(){
 void MainWindow::setup_done(){
     this->out_dir_name=this->grader_setup_widget->out_dir_name;
     this->filesList=this->grader_setup_widget->filesList;
+    this->sub_tex_name=this->grader_setup_widget->sub_tex_name;
     delete this->grader_setup_widget;
-    this->grader_editor_widget=new grader_editor(this,this->filesList,this->out_dir_name);
+    this->grader_editor_widget=new grader_editor(this,this->filesList,this->out_dir_name,this->sub_tex_name);
     this->grader_editor_widget->show();
     this->setFixedWidth(this->grader_editor_widget->size().width());
     this->setFixedHeight(this->grader_editor_widget->size().height());
