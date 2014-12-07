@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
+#include <QCompleter>
 #include "grader_marks_widget.h"
 
 grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name,QString sub_tex_name) :
@@ -27,6 +28,19 @@ grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_d
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+
+    this->ui->marks_label->setBuddy(this->marks_widget);
+
+    this->ui->file_name_combo->setCompleter(new QCompleter(this->ui->file_name_combo));
+    this->ui->file_name_combo->completer()->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    this->ui->file_name_combo->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+    this->ui->file_name_combo->completer()->setModel(this->ui->file_name_combo->model());
+
+
+    this->ui->comment_pos_combo->setCompleter(new QCompleter(this->ui->comment_pos_combo));
+    this->ui->comment_pos_combo->completer()->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    this->ui->comment_pos_combo->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+    this->ui->comment_pos_combo->completer()->setModel(this->ui->comment_pos_combo->model());
 }
 
 grader_editor::~grader_editor()

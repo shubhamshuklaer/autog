@@ -41,7 +41,10 @@
     </font>
    </property>
    <property name="text">
-    <string>File name</string>
+    <string>&amp;ID</string>
+   </property>
+   <property name="buddy">
+    <cstring>file_name_combo</cstring>
    </property>
   </widget>
   <widget class="QTextEdit" name="comment_text">
@@ -60,7 +63,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QLabel" name="marks_label">
    <property name="geometry">
     <rect>
      <x>8</x>
@@ -82,7 +85,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Marks</string>
+    <string>&amp;Marks</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
@@ -107,7 +110,10 @@
     </font>
    </property>
    <property name="text">
-    <string>Comment</string>
+    <string>&amp;Comment</string>
+   </property>
+   <property name="buddy">
+    <cstring>comment_text</cstring>
    </property>
   </widget>
   <widget class="QWidget" name="marks_widget" native="true">
@@ -120,68 +126,8 @@
     </rect>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
+    <enum>Qt::NoFocus</enum>
    </property>
-  </widget>
-  <widget class="QComboBox" name="file_name_combo">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>10</y>
-     <width>311</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QComboBox { border: 3px solid gray; border-radius: 18px; padding: 2px 20px 2px 8px; border-color: lightgray; background: white; selection-background-color: rgb(240, 119, 70);}
-QComboBox:focus { 
-border-color: rgb(240, 119, 70);
- }</string>
-   </property>
-   <property name="insertPolicy">
-    <enum>QComboBox::NoInsert</enum>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comment_pos_combo">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>120</y>
-     <width>71</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::TabFocus</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QComboBox { border: 3px solid gray; border-radius: 18px; padding: 2px 20px 2px 8px; border-color: lightgray; background: white; selection-background-color: rgb(240, 119, 70);}
-QComboBox:focus { 
-
-border-color: rgb(240, 119, 70);
- }s</string>
-   </property>
-   <property name="insertPolicy">
-    <enum>QComboBox::NoInsert</enum>
-   </property>
-   <item>
-    <property name="text">
-     <string>t</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>m</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>b</string>
-    </property>
-   </item>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -301,10 +247,56 @@ border-color: rgb(240, 119, 70);
     <string>See &amp;Errors</string>
    </property>
   </widget>
+  <widget class="QComboBox" name="file_name_combo">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>10</y>
+     <width>311</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <property name="insertPolicy">
+    <enum>QComboBox::NoInsert</enum>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comment_pos_combo">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>120</y>
+     <width>71</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <property name="insertPolicy">
+    <enum>QComboBox::NoInsert</enum>
+   </property>
+   <item>
+    <property name="text">
+     <string>t</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>m</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>b</string>
+    </property>
+   </item>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>file_name_combo</tabstop>
-  <tabstop>marks_widget</tabstop>
   <tabstop>comment_pos_combo</tabstop>
   <tabstop>comment_text</tabstop>
   <tabstop>next_btn</tabstop>

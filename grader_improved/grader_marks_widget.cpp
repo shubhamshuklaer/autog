@@ -26,6 +26,8 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
         }
     }
     this->ui->marks_text->setValidator(new QDoubleValidator(this));
+    this->setFocusPolicy(Qt::StrongFocus);
+    this->setFocusProxy(this->ui->marks_text);
     connect(this->ui->marks_text,SIGNAL(textChanged(QString)),this,SIGNAL(marks_changed()));
 }
 
