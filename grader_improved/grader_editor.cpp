@@ -6,41 +6,74 @@
 #include <QMessageBox>
 #include <QCompleter>
 #include "grader_marks_widget.h"
+#include <QFile>
+#include <QTextStream>
 
-grader_editor::grader_editor(QWidget *parent,QStringList filesList,QString out_dir_name,QString sub_tex_name) :
+
+const QString module_config_file_name="module.config";
+const QString const_out_dir_name="texfiles";
+const QString const_sub_tex_name="sub_file.tex";
+const QChar id_marks_delimiter=';';
+const QChar marks_denominations_delemiter='+';
+
+grader_editor::grader_editor(QWidget *parent,QString project_path,QString module_name) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
     ui->setupUi(this);
-    this->filesList=filesList;
-    this->out_dir_name=out_dir_name;
-    this->current_index=0;
-    this->sub_tex_name=sub_tex_name;
-    this->ui->file_name_combo->addItems(this->filesList);
-    this->ui->file_name_combo->setCurrentIndex(0);
-    QStringList marks_denominations=QStringList()<<"0.5"<<"0.5"<<"1"<<"2";
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,marks_denominations);
-//    t->show();
-    //    this->ui->marks_widget->layout()->addWidget(temp);
-    this->marks_widget->setProperty("marks",get_marks(this->filesList[0]));
-    this->ui->comment_text->setText(get_comment(this->filesList[0]));
-    if(this->current_index+1>=this->filesList.length())
-        this->ui->next_btn->setEnabled(false);
-    this->ui->prev_btn->setEnabled(false);
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    this->project_path=project_path;
+    this->module_name=module_name;
+    QFile module_config_file(project_path+"/"+module_name+"/"+module_config_file_name);
+    if(!module_config_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open config file ")+project_path+"/"+module_name+"/"+module_config_file_name);
+        QApplication::quit();
+    }else{
+        QTextStream in(&module_config_file);
+        QString temp_line;
+        QStringList temp_split;
+        while(!in.atEnd()){
+            temp_line=in.readLine();
+            if(temp_line!=NULL){
+                temp_split=temp_line.split(id_marks_delimiter);
+                this->filesList<<temp_split[0];
+                this->marks_denominations<<temp_split[1];
+            }
+        }
+        if(this->filesList.length()==0){
+            QMessageBox::warning(this,tr("Error"),tr("no page Ids in the config file")+project_path+"/"+module_name+"/"+module_config_file_name);
+            QApplication::quit();
+        }else{
+            this->out_dir_name=project_path+"/"+module_name+"/"+const_out_dir_name;
+            this->current_index=0;
+            this->sub_tex_name=project_path+"/"+const_sub_tex_name;
+            this->ui->file_name_combo->addItems(this->filesList);
+            this->ui->file_name_combo->setCurrentIndex(0);
 
-    this->ui->marks_label->setBuddy(this->marks_widget);
+            this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[0].split(marks_denominations_delemiter));
+            this->marks_widget->setProperty("marks",get_marks(this->filesList[0]));
+            this->ui->comment_text->setText(get_comment(this->filesList[0]));
+            if(this->current_index+1>=this->filesList.length())
+                this->ui->next_btn->setEnabled(false);
+            this->ui->prev_btn->setEnabled(false);
+            connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
 
-    this->ui->file_name_combo->setCompleter(new QCompleter(this->ui->file_name_combo));
-    this->ui->file_name_combo->completer()->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    this->ui->file_name_combo->completer()->setCaseSensitivity(Qt::CaseInsensitive);
-    this->ui->file_name_combo->completer()->setModel(this->ui->file_name_combo->model());
+            this->ui->marks_label->setBuddy(this->marks_widget);
+
+            QCompleter *completer;
+            completer=new QCompleter(this->ui->file_name_combo);
+            completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setModel(this->ui->file_name_combo->model());
+            this->ui->file_name_combo->setCompleter(completer);
 
 
-    this->ui->comment_pos_combo->setCompleter(new QCompleter(this->ui->comment_pos_combo));
-    this->ui->comment_pos_combo->completer()->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    this->ui->comment_pos_combo->completer()->setCaseSensitivity(Qt::CaseInsensitive);
-    this->ui->comment_pos_combo->completer()->setModel(this->ui->comment_pos_combo->model());
+            completer=new QCompleter(this->ui->comment_pos_combo);
+            completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setModel(this->ui->comment_pos_combo->model());
+            this->ui->comment_pos_combo->setCompleter(completer);
+        }
+    }
 }
 
 grader_editor::~grader_editor()
@@ -57,7 +90,10 @@ void grader_editor::on_next_btn_clicked()
     this->ui->prev_btn->setEnabled(true);
     this->current_index++;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
+    delete this->marks_widget;
+    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    this->marks_widget->show();
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 
 }
@@ -71,7 +107,10 @@ void grader_editor::on_prev_btn_clicked()
     this->ui->next_btn->setEnabled(true);
     this->current_index--;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
+    delete this->marks_widget;
+    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    this->marks_widget->show();
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 }
 
@@ -160,7 +199,10 @@ void grader_editor::on_file_name_combo_activated(int index)
         this->ui->next_btn->setEnabled(false);
     else
         this->ui->next_btn->setEnabled(true);
+    delete this->marks_widget;
+    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    this->marks_widget->show();
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index]));
 
 }

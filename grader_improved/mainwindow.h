@@ -5,6 +5,7 @@
 #include "grader_settings.h"
 #include "grader_editor.h"
 #include "grader_setup.h"
+#include "grader_project_load.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,9 +19,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     grader_settings *grader_settings_widget;
     grader_editor *grader_editor_widget;
-    grader_setup *grader_setup_widget;
-    QString out_dir_name,sub_tex_name;
-    QStringList filesList;
+    grader_project_load *grader_load_widget;
+    QString project_path,module_name;
 
     ~MainWindow();
 

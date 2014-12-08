@@ -16,10 +16,11 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QStringList filesList=QStringList(),QString out_dir_name=QString(),QString sub_tex_name=QString());
+    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString());
     ~grader_editor();
     int current_index;
-    QStringList filesList;
+    QString project_path,module_name;
+    QStringList filesList,marks_denominations;
     QString out_dir_name,sub_tex_name,tex_errors;
     QMutex file_mutex,tex_mutex,main_file_mutex;
     QReadWriteLock tex_errors_lock;
@@ -35,6 +36,7 @@ public:
     void preview_thread_func_comment(void);
     void preview_thread_func_comment_pos(QString comment_pos);
     QString escape_string(QString comment);
+
 
 private slots:
     void on_next_btn_clicked();

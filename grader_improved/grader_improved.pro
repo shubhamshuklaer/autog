@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     grader_settings.cpp \
     grader_shortcuts.cpp \
     latex_highlight.cpp \
-    grader_marks_widget.cpp
+    grader_marks_widget.cpp \
+    grader_project_load.cpp
 
 HEADERS  += mainwindow.h \
     grader_setup.h \
@@ -27,11 +28,13 @@ HEADERS  += mainwindow.h \
     grader_settings.h \
     grader_shortcuts.h \
     latex_highlight.h \
-    grader_marks_widget.h
+    grader_marks_widget.h \
+    grader_project_load.h
 
 FORMS    += mainwindow.ui \
     grader_setup.ui \
     grader_editor.ui \
     grader_settings.ui \
     grader_shortcuts.ui \
-    grader_marks_widget.ui
+    grader_marks_widget.ui \
+    grader_project_load.ui
