@@ -16,25 +16,27 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString());
+    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList filesList=QStringList(),QStringList marks_denominations=QStringList());
     ~grader_editor();
     int current_index;
+    int previous_comment_pos_index;
     QString project_path,module_name;
     QStringList filesList,marks_denominations;
-    QString out_dir_name,sub_tex_name,tex_errors;
+    QString out_dir_name,sub_tex_name,tex_errors,main_tex_dir_name;
     QMutex file_mutex,tex_mutex,main_file_mutex;
     QReadWriteLock tex_errors_lock;
     grader_marks_widget *marks_widget;
     QFuture<void> future;
     QString get_marks(QString file_name);
-    QString get_comment(QString file_name);
+    QString get_comment(QString file_name,QString comment_pos);
     void put_marks(QString file_name , QString marks);
-    void put_comment(QString file_name , QString comment);
+    void put_comment(QString file_name , QString comment,QString comment_pos);
     void put_comment_pos(QString file_name, QString comment_pos);
     void include_only(bool);
     void preview_thread_func_marks(void);
     void preview_thread_func_comment(void);
     void preview_thread_func_comment_pos(QString comment_pos);
+    void generate_pdf(bool is_include_only);
     QString escape_string(QString comment);
 
 

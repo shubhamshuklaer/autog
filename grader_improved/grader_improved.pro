@@ -29,7 +29,8 @@ HEADERS  += mainwindow.h \
     grader_shortcuts.h \
     latex_highlight.h \
     grader_marks_widget.h \
-    grader_project_load.h
+    grader_project_load.h \
+    constants.h
 
 FORMS    += mainwindow.ui \
     grader_setup.ui \

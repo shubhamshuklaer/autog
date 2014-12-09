@@ -21,6 +21,7 @@ public:
     grader_editor *grader_editor_widget;
     grader_project_load *grader_load_widget;
     QString project_path,module_name;
+    QStringList filesList,marks_denominations;
 
     ~MainWindow();
 
