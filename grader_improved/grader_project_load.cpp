@@ -119,8 +119,6 @@ bool grader_project_load::setup_module(){
     process.setWorkingDirectory(module_dir_name);
     process.start("mkdir "+const_out_dir_name);
     process.waitForFinished(-1);
-    process.start("mkdir "+const_main_tex_dir_name);
-    process.waitForFinished(-1);
     process.setWorkingDirectory(module_dir_name+"/"+const_out_dir_name);
 
     QDir project_dir(this->project_path);
@@ -183,42 +181,42 @@ bool grader_project_load::setup_module(){
     }
 
 
-    process.setWorkingDirectory(module_dir_name+"/"+const_main_tex_dir_name);
+    process.setWorkingDirectory(module_dir_name);
     process.start("cp",QStringList() << top_tex_path << const_main_pdf_name+".tex");
     process.waitForFinished(-1);
 
-    process.setStandardOutputFile(module_dir_name+"/"+const_main_tex_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
+    process.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
     process.start("echo",QStringList() << "\\begin{document}");
     process.waitForFinished(-1);
     process.kill();
     for(int i=0;i<this->filesList.length();i++){
         QProcess process1;
-        process1.setWorkingDirectory(module_dir_name+"/"+const_main_tex_dir_name);
-        process1.setStandardOutputFile(module_dir_name+"/"+const_main_tex_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
-        process1.start("echo",QStringList() << "\\include{"+const_main_tex_to_sub_tex_parent_dir+"/"+const_out_dir_name+"/"+this->filesList[i]+"}");
+        process1.setWorkingDirectory(module_dir_name);
+        process1.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
+        process1.start("echo",QStringList() << "\\include{"+const_out_dir_name+"/"+this->filesList[i]+"}");
         process1.waitForFinished(-1);
         process1.kill();
     }
     QProcess process2;
-    process2.setWorkingDirectory(module_dir_name+"/"+const_main_tex_dir_name);
-    process2.setStandardOutputFile(module_dir_name+"/"+const_main_tex_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
+    process2.setWorkingDirectory(module_dir_name);
+    process2.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
     process2.start("echo",QStringList() << "\\end{document}");
     process2.waitForFinished(-1);
     process2.kill();
 
     QProcess process3;
-    process3.setWorkingDirectory(module_dir_name+"/"+const_main_tex_dir_name);
+    process3.setWorkingDirectory(module_dir_name);
     process3.start("cp",QStringList() << const_main_pdf_name+".tex" << "temp.tex");
     process3.waitForFinished(-1);
-    process3.setStandardInputFile(module_dir_name+"/"+const_main_tex_dir_name+"/temp.tex");
-    process3.setStandardOutputFile(module_dir_name+"/"+const_main_tex_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Truncate);
+    process3.setStandardInputFile(module_dir_name+"/temp.tex");
+    process3.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Truncate);
     QString temp="s:\\\\newcommand{\\\\burstsdir}{.*:\\\\newcommand{\\\\burstsdir}{"+bursts_dir_path+"}:";
     process3.start("sed",QStringList()<<temp);
     process3.waitForFinished(-1);
     process3.kill();
 
     QProcess process4;
-    process4.setWorkingDirectory(module_dir_name+"/"+const_main_tex_dir_name);
+    process4.setWorkingDirectory(module_dir_name);
     process4.start("rm", QStringList() << "temp.tex");
     process4.waitForFinished(-1);
 

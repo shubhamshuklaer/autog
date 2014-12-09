@@ -12,8 +12,9 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
     this->check_box_list=QList<QCheckBox *>();
     int i=0;
     foreach(QString mark,marks_denominations){
-        qDebug() <<mark;
+        qDebug() <<"marks "<<mark;
         if(mark.toFloat()!=0){
+            qDebug() <<mark.toFloat();
             QCheckBox *temp_box=new QCheckBox();
             temp_box->setText(mark);
             this->ui->horizontal_layout->addWidget(temp_box);

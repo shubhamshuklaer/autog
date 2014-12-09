@@ -23,7 +23,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->marks_denominations=marks_denominations;
 
     this->out_dir_name=project_path+"/"+module_name+"/"+const_out_dir_name;
-    this->main_tex_dir_name=project_path+"/"+module_name+"/"+const_main_tex_dir_name;
+    this->main_tex_dir_name=project_path+"/"+module_name;
     this->current_index=0;
     this->sub_tex_name=project_path+"/"+const_sub_tex_name;
     this->ui->file_name_combo->addItems(this->filesList);
@@ -36,7 +36,6 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
-
     this->ui->marks_label->setBuddy(this->marks_widget);
 
     QCompleter *completer;
@@ -73,6 +72,8 @@ void grader_editor::on_next_btn_clicked()
     delete this->marks_widget;
     this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    this->ui->marks_label->setBuddy(this->marks_widget);
     this->marks_widget->show();
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
@@ -92,6 +93,8 @@ void grader_editor::on_prev_btn_clicked()
     delete this->marks_widget;
     this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    this->ui->marks_label->setBuddy(this->marks_widget);
     this->marks_widget->show();
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
@@ -132,6 +135,8 @@ void grader_editor::on_file_name_combo_activated(int index)
     delete this->marks_widget;
     this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
+    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    this->ui->marks_label->setBuddy(this->marks_widget);
     this->marks_widget->show();
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
@@ -231,14 +236,14 @@ void grader_editor::include_only(bool is_include_only){
     QString temp;
     if(process.readAllStandardOutput()==""){
         if(is_include_only){
-            temp="1i\\ \\\\includeonly{"+const_main_tex_to_sub_tex_parent_dir+"\\\/"+const_out_dir_name+"\\\/"+this->filesList[this->current_index]+"}";
+            temp="1i\\ \\\\includeonly{"+const_out_dir_name+"\\\/"+this->filesList[this->current_index]+"}";
             process1.start("sed",QStringList()<<temp);
             process1.waitForFinished(-1);
             process1.kill();
         }
     }else{
         if(is_include_only)
-            temp="s:\\\\includeonly{.*:\\\\includeonly{"+const_main_tex_to_sub_tex_parent_dir+"\\\/"+const_out_dir_name+"\\\/"+this->filesList[this->current_index]+"}:";
+            temp="s:\\\\includeonly{.*:\\\\includeonly{"+const_out_dir_name+"\\\/"+this->filesList[this->current_index]+"}:";
         else
             temp="s:\\\\includeonly{.*::";
         process1.start("sed",QStringList()<<temp);
@@ -257,6 +262,7 @@ void grader_editor::include_only(bool is_include_only){
 
 void grader_editor::on_marks_text_textChanged()
 {
+    qDebug()<<"marks text changed";
     this->future=QtConcurrent::run(this, &grader_editor::generate_pdf,true);
 }
 
