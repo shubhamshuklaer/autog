@@ -63,6 +63,7 @@ private slots:
 
 private:
     Ui::grader_editor *ui;
+    void setup_marks_widget(int index);
 };
 
 #endif // GRADER_EDITOR_H

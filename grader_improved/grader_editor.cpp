@@ -29,14 +29,12 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->ui->file_name_combo->addItems(this->filesList);
     this->ui->file_name_combo->setCurrentIndex(0);
 
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[0].split(marks_denominations_delemiter));
-    this->marks_widget->setProperty("marks",get_marks(this->filesList[0]));
+    setup_marks_widget(0);
+
     this->ui->comment_text->setText(get_comment(this->filesList[0],"t"));
     if(this->current_index+1>=this->filesList.length())
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
-    this->ui->marks_label->setBuddy(this->marks_widget);
 
     QCompleter *completer;
     completer=new QCompleter(this->ui->file_name_combo);
@@ -69,12 +67,7 @@ void grader_editor::on_next_btn_clicked()
     this->ui->prev_btn->setEnabled(true);
     this->current_index++;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    delete this->marks_widget;
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
-    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
-    this->ui->marks_label->setBuddy(this->marks_widget);
-    this->marks_widget->show();
+    setup_marks_widget(this->current_index);
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index],"t"));
@@ -90,12 +83,7 @@ void grader_editor::on_prev_btn_clicked()
     this->ui->next_btn->setEnabled(true);
     this->current_index--;
     this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    delete this->marks_widget;
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
-    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
-    this->ui->marks_label->setBuddy(this->marks_widget);
-    this->marks_widget->show();
+    setup_marks_widget(this->current_index);
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index],"t"));
@@ -132,12 +120,7 @@ void grader_editor::on_file_name_combo_activated(int index)
         this->ui->next_btn->setEnabled(false);
     else
         this->ui->next_btn->setEnabled(true);
-    delete this->marks_widget;
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[current_index].split(marks_denominations_delemiter));
-    this->marks_widget->setProperty("marks",get_marks(this->filesList[this->current_index]));
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
-    this->ui->marks_label->setBuddy(this->marks_widget);
-    this->marks_widget->show();
+    setup_marks_widget(this->current_index);
     this->ui->comment_pos_combo->setCurrentIndex(0);
     this->previous_comment_pos_index=0;
     this->ui->comment_text->setText(get_comment(this->filesList[this->current_index],"t"));
@@ -356,4 +339,13 @@ void grader_editor::generate_pdf(bool is_include_only){
         this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
     }
     this->tex_errors_lock.unlock();
+}
+
+void grader_editor::setup_marks_widget(int index){
+    delete this->marks_widget;
+    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[index].split(marks_denominations_delemiter));
+    this->marks_widget->setProperty("marks",get_marks(this->filesList[index]));
+    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    this->ui->marks_label->setBuddy(this->marks_widget);
+    this->marks_widget->show();
 }
