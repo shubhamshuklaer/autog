@@ -11,6 +11,7 @@
 #include "constants.h"
 
 
+extern QString latex_compile_command;
 
 grader_editor::grader_editor(QWidget *parent,QString project_path,QString module_name,QStringList filesList,QStringList marks_denominations) :
     QWidget(parent),
@@ -317,7 +318,7 @@ void grader_editor::generate_pdf(bool is_include_only){
     QProcess process;
     process.setWorkingDirectory(this->main_tex_dir_name);
     this->tex_mutex.lock();
-    process.start("pdflatex -file-line-error -interaction=nonstopmode "+const_main_pdf_name+".tex");
+    process.start(latex_compile_command+" "+const_main_pdf_name+".tex");
     process.waitForFinished(-1);
     this->tex_mutex.unlock();
     QProcess tex_error_p1,tex_error_p2;

@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include "constants.h"
 
+QString latex_compile_command;
 
 grader_project_load::grader_project_load(QWidget *parent) :
     QWidget(parent),
@@ -41,6 +42,7 @@ void grader_project_load::on_select_project_btn_clicked()
         if(dir.exists(project_config_name)){
             if(parse_project_config(dir_name)){
                 this->ui->select_module_widget->setEnabled(true);
+                load_settings();
             }
         }else{
             QMessageBox::warning(
@@ -240,4 +242,37 @@ bool grader_project_load::setup_module(){
     process5.start("rm temp.tex");
     process5.waitForFinished(-1);
     return true;
+}
+
+
+void grader_project_load::load_settings(){
+    latex_compile_command=QString();
+    QDir project_dir(this->project_path);
+    if(project_dir.exists(settings_config_name)){
+        QFile settings_config_file(this->project_path+"/"+this->module_name+"/"+settings_config_name);
+        if(!settings_config_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open settings config file ")+this->project_path+"/"+this->module_name+"/"+settings_config_name);
+            return;
+        }
+
+        QTextStream in(&settings_config_file);
+        QString temp_line;
+        QStringList temp_split;
+        while(!in.atEnd()){
+            temp_line=in.readLine();
+            if(temp_line!=NULL){
+                temp_split=temp_line.split(settings_delemiter);
+                if(temp_split[0]==latex_compile_command_setting_name&&temp_split[1]!=NULL){
+                    latex_compile_command=temp_split[1];
+                    qDebug() <<"latex compile set";
+                }
+            }
+        }
+    }
+
+    if(latex_compile_command==NULL){
+        latex_compile_command=default_latex_compile_command;
+        qDebug()<<"Default set";
+    }
+    qDebug() <<latex_compile_command;
 }

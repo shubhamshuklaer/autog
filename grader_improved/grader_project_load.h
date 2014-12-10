@@ -35,6 +35,7 @@ private:
     QStringList filesList,marks_denominations;
     bool parse_project_config(QString);
     bool setup_module();
+    void load_settings();
 };
 
 #endif // GRADER_LOAD_H
