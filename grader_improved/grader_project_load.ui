@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>grader_load</class>
- <widget class="QWidget" name="grader_load">
+ <class>grader_project_load</class>
+ <widget class="QWidget" name="grader_project_load">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -66,8 +66,28 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::TabFocus</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+    </property>
     <property name="text">
      <string>&amp;Start/Resume</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="default">
+     <bool>false</bool>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
@@ -100,8 +120,29 @@
     </item>
     <item>
      <widget class="QPushButton" name="select_project_btn">
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}
+</string>
+      </property>
       <property name="text">
        <string>Select &amp;Project</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
       </property>
      </widget>
     </item>

@@ -1,5 +1,5 @@
 #include "grader_project_load.h"
-#include "ui_grader_load.h"
+#include "ui_grader_project_load.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
@@ -14,7 +14,7 @@
 
 grader_project_load::grader_project_load(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::grader_load)
+    ui(new Ui::grader_project_load)
 {
     ui->setupUi(this);
     QCompleter *module_completer=new QCompleter(this->ui->select_module_combo);

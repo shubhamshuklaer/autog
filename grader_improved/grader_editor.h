@@ -61,6 +61,8 @@ private slots:
 
     void on_see_errors_btn_clicked();
 
+    void on_open_tex_btn_clicked();
+
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);

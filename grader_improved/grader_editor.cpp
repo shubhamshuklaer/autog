@@ -28,7 +28,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->sub_tex_name=project_path+"/"+const_sub_tex_name;
     this->ui->file_name_combo->addItems(this->filesList);
     this->ui->file_name_combo->setCurrentIndex(0);
-
+    this->marks_widget=NULL;
     setup_marks_widget(0);
 
     this->ui->comment_text->setText(get_comment(this->filesList[0],"t"));
@@ -342,10 +342,21 @@ void grader_editor::generate_pdf(bool is_include_only){
 }
 
 void grader_editor::setup_marks_widget(int index){
-    delete this->marks_widget;
+    if(this->marks_widget!=NULL)
+        delete this->marks_widget;
     this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[index]));
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
     this->ui->marks_label->setBuddy(this->marks_widget);
     this->marks_widget->show();
+}
+
+
+
+void grader_editor::on_open_tex_btn_clicked()
+{
+    QProcess process;
+    process.setWorkingDirectory(this->out_dir_name);
+    process.start("gnome-open", QStringList()<<this->filesList[this->current_index]+".tex");
+    process.waitForFinished(-1);
 }

@@ -132,9 +132,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>180</y>
-     <width>401</width>
+     <width>391</width>
      <height>29</height>
     </rect>
    </property>
@@ -157,6 +157,22 @@
       </property>
       <property name="text">
        <string>&amp;Previous</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="open_tex_btn">
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Open &amp;tex</string>
       </property>
      </widget>
     </item>

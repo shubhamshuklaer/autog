@@ -5,7 +5,7 @@
 #include <QDir>
 
 namespace Ui {
-class grader_load;
+class grader_project_load;
 }
 
 class grader_project_load : public QWidget
@@ -30,7 +30,7 @@ private slots:
     void on_start_btn_clicked();
 
 private:
-    Ui::grader_load *ui;
+    Ui::grader_project_load *ui;
     QString module_name,project_path;
     QStringList filesList,marks_denominations;
     bool parse_project_config(QString);
