@@ -347,6 +347,7 @@ void grader_editor::setup_marks_widget(int index){
         delete this->marks_widget;
     this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations[index].split(marks_denominations_delemiter));
     this->marks_widget->setProperty("marks",get_marks(this->filesList[index]));
+    this->marks_widget->setFixedSize(this->ui->marks_widget->size());
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
     this->ui->marks_label->setBuddy(this->marks_widget);
     this->marks_widget->show();
