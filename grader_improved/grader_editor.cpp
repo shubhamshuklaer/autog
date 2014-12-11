@@ -22,6 +22,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->module_name=module_name;
     this->filesList=filesList;
     this->marks_denominations=marks_denominations;
+    this->future=QFuture<void>();
 
     this->out_dir_name=project_path+"/"+module_name+"/"+const_out_dir_name;
     this->main_tex_dir_name=project_path+"/"+module_name;
@@ -141,7 +142,7 @@ QString grader_editor::get_marks(QString file_name){
     QString stdout = process.readAllStandardOutput();
 //    QString stderr = process.readAllStandardError();
     this->file_mutex.unlock();
-    return stdout;
+    return stdout.simplified();
 }
 
 void grader_editor::put_marks(QString file_name, QString marks){
@@ -246,12 +247,13 @@ void grader_editor::include_only(bool is_include_only){
 
 void grader_editor::on_marks_text_textChanged()
 {
-    qDebug()<<"marks text changed";
+    this->future.cancel();
     this->future=QtConcurrent::run(this, &grader_editor::generate_pdf,true);
 }
 
 void grader_editor::on_comment_text_textChanged()
 {
+    this->future.cancel();
     this->future=QtConcurrent::run(this, &grader_editor::generate_pdf,true);
 }
 
@@ -269,9 +271,9 @@ QString grader_editor::escape_string(QString comment){
     comment.replace("&","\\&");
     comment.replace(":","\\:");
     QString temp="[\\n\\t\\r]";
-    qDebug() <<temp;
+//    qDebug() <<temp;
     comment.replace(temp,"+");
-    qDebug() <<comment;
+//    qDebug() <<comment;
     return comment;
 }
 
@@ -314,6 +316,7 @@ void grader_editor::on_see_errors_btn_clicked()
 void grader_editor::generate_pdf(bool is_include_only){
     put_marks(this->filesList[this->current_index],this->marks_widget->property("marks").toString());
     put_comment(this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    qDebug()<<"Generate pdf";
     include_only(is_include_only);
     QProcess process;
     process.setWorkingDirectory(this->main_tex_dir_name);

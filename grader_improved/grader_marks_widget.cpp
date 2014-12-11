@@ -9,6 +9,7 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
     ui(new Ui::grader_marks_widget)
 {
     ui->setupUi(this);
+    this->ui->marks_text->setValidator(new QDoubleValidator(this));
     this->check_box_list=QList<QCheckBox *>();
     int i=0;
     foreach(QString mark,marks_denominations){
@@ -26,7 +27,6 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
                 QWidget::setTabOrder(this->check_box_list[i-1],this->check_box_list[i]);
         }
     }
-    this->ui->marks_text->setValidator(new QDoubleValidator(this));
     this->setFocusPolicy(Qt::StrongFocus);
     this->setFocusProxy(this->ui->marks_text);
     connect(this->ui->marks_text,SIGNAL(textChanged(QString)),this,SIGNAL(marks_changed()));
