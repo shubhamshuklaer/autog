@@ -3,9 +3,8 @@
 
 #include <QWidget>
 #include <QMutex>
-#include <QtConcurrent/QtConcurrent>
-#include <QReadWriteLock>
 #include "grader_marks_widget.h"
+#include "grader_file_sys.h"
 
 namespace Ui {
 class grader_editor;
@@ -23,21 +22,8 @@ public:
     QString project_path,module_name;
     QStringList filesList,marks_denominations;
     QString out_dir_name,sub_tex_name,tex_errors,main_tex_dir_name;
-    QMutex file_mutex,tex_mutex,main_file_mutex;
-    QReadWriteLock tex_errors_lock;
     grader_marks_widget *marks_widget;
-    QFuture<void> future;
-    QString get_marks(QString file_name);
-    QString get_comment(QString file_name,QString comment_pos);
-    void put_marks(QString file_name , QString marks);
-    void put_comment(QString file_name , QString comment,QString comment_pos);
-    void put_comment_pos(QString file_name, QString comment_pos);
-    void include_only(bool);
-    void preview_thread_func_marks(void);
-    void preview_thread_func_comment(void);
-    void preview_thread_func_comment_pos(QString comment_pos);
-    void generate_pdf(bool is_include_only);
-    QString escape_string(QString comment);
+    grader_file_sys *file_sys_interface;
 
 
 private slots:
@@ -47,15 +33,7 @@ private slots:
 
     void on_preview_btn_clicked();
 
-    void on_gen_pdf_btn_clicked();
-
     void on_file_name_combo_activated(int index);
-
-    void on_marks_text_textChanged();
-
-    void on_comment_text_textChanged();
-
-    void on_comment_pos_combo_activated(int index);
 
     void on_fix_file_btn_clicked();
 
@@ -66,6 +44,9 @@ private slots:
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);
+
+
+
 };
 
 #endif // GRADER_EDITOR_H
