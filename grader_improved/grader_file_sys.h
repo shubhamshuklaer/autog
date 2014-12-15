@@ -11,10 +11,9 @@ public:
     explicit grader_file_sys(QObject *parent = 0,QString main_tex_dir_name=QString(),QString out_dir_name=QString());
     QString get_marks(QString file_name);
     QString get_comment(QString file_name,QString comment_pos);
-    void put_marks(QString file_name , QString marks);
-    void put_comment(QString file_name , QString comment,QString comment_pos);
-    void put_comment_pos(QString file_name, QString comment_pos);
-    QString generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos);
+    Q_INVOKABLE void put_marks(QString file_name , QString marks);
+    Q_INVOKABLE void put_comment(QString file_name , QString comment,QString comment_pos);
+    Q_INVOKABLE QString generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos);
 
     QString main_tex_dir_name,out_dir_name;
 

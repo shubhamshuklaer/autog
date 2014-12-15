@@ -2,6 +2,7 @@
 #include "constants.h"
 #include <QProcess>
 #include <QDebug>
+#include <QThread>
 
 extern QString latex_compile_command;
 
@@ -130,6 +131,7 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     bool is_include_only=true;
     put_marks(file_name,marks);
     put_comment(file_name,comment_text,comment_pos);
+    qDebug() << "File sys thread"<<QThread::currentThreadId();
     qDebug()<<"Generate pdf";
     include_only(is_include_only,file_name);
     QProcess process;
