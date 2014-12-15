@@ -10,6 +10,7 @@
 #include "constants.h"
 #include <QMetaMethod>
 #include <QMutex>
+#include <QCoreApplication>
 
 
 grader_editor::grader_editor(QWidget *parent,QString project_path,QString module_name,QStringList filesList,QStringList marks_denominations) :
@@ -192,7 +193,7 @@ void grader_editor::on_comment_text_textChanged()
 
 void grader_editor::on_comment_pos_combo_activated(int index)
 {
-    put_comment(true,this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->previous_comment_pos_index));
+    put_comment(false,this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->previous_comment_pos_index));
     this->previous_comment_pos_index=index;
     this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],this->ui->comment_pos_combo->itemText(index)));
 }
@@ -229,9 +230,9 @@ void grader_editor::generate_pdf(bool async,QString file_name,QString marks,QStr
     if(async){
         QByteArray normalizedSignature = QMetaObject::normalizedSignature("generate_pdf(QString, QString,QString,QString)");
         int method_index=this->file_sys_interface->metaObject()->indexOfMethod(normalizedSignature);
-        qDebug()<<normalizedSignature;
         QMetaMethod method=this->file_sys_interface->metaObject()->method(method_index);
-        qDebug()<<method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString,file_name),Q_ARG(QString,marks),Q_ARG(QString,comment_text),Q_ARG(QString,comment_pos));
+        QCoreApplication::removePostedEvents(this->file_sys_interface);
+        method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString,file_name),Q_ARG(QString,marks),Q_ARG(QString,comment_text),Q_ARG(QString,comment_pos));
     }else{
         this->tex_errors_lock.lock();
         this->tex_errors=this->file_sys_interface->generate_pdf(file_name,marks,comment_text,comment_pos);
