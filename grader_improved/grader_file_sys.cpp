@@ -160,12 +160,13 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
 
 QString grader_file_sys::escape_string(QString comment){
     comment=comment.simplified();
+//    comment=comment.trimmed();
     comment.replace("\\","\\\\");
     comment.replace("&","\\&");
     comment.replace(":","\\:");
-    QString temp="[\\n\\t\\r]";
+//    QString temp=;
 //    qDebug() <<temp;
-    comment.replace(temp,"+");
+//    comment.replace(QRegExp("[\\n\\t\\r]"),"\\\\n");
 //    qDebug() <<comment;
     return comment;
 }

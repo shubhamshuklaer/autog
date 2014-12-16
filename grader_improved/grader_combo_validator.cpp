@@ -2,6 +2,7 @@
 #include <QValidator>
 #include <QAbstractListModel>
 #include <QModelIndex>
+#include <QDebug>
 
 grader_combo_validator::grader_combo_validator(QObject * parent,QAbstractItemModel *model):
     QValidator(parent)
@@ -38,6 +39,20 @@ QValidator::State grader_combo_validator::validate(QString &input, int &pos) con
     return return_state;
 }
 
-void grader_combo_validator::fixup(QString &input){
-
+void grader_combo_validator::fixup(QString &input) const{
+    QModelIndex index;
+    QString item_text;
+    bool done=false;
+    int i=0;
+    int j=this->item_model->rowCount();
+    while(i<j&&!done){
+        index=this->item_model->index(i,0);
+        item_text=this->item_model->data(index).toString();
+        item_text.truncate(input.length());
+        if(item_text.toLower()==input.toLower()){
+            input=this->item_model->data(index).toString();
+            done=true;
+        }
+        i++;
+    }
 }
