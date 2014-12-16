@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     grader_editor.cpp \
     grader_marks_widget.cpp \
     grader_project_load.cpp \
-    grader_file_sys.cpp
+    grader_file_sys.cpp \
+    grader_combo_validator.cpp
 
 HEADERS  += mainwindow.h \
     grader_setup.h \
@@ -25,7 +26,8 @@ HEADERS  += mainwindow.h \
     grader_marks_widget.h \
     grader_project_load.h \
     constants.h \
-    grader_file_sys.h
+    grader_file_sys.h \
+    grader_combo_validator.h
 
 FORMS    += mainwindow.ui \
     grader_setup.ui \

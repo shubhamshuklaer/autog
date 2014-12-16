@@ -11,6 +11,7 @@
 #include <QMetaMethod>
 #include <QMutex>
 #include <QCoreApplication>
+#include "grader_combo_validator.h"
 
 
 grader_editor::grader_editor(QWidget *parent,QString project_path,QString module_name,QStringList filesList,QStringList marks_denominations) :
@@ -47,17 +48,19 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
 
     QCompleter *completer;
     completer=new QCompleter(this->ui->file_name_combo);
-    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->file_name_combo->model());
     this->ui->file_name_combo->setCompleter(completer);
+    this->ui->file_name_combo->setValidator(new grader_combo_validator(this->ui->file_name_combo,this->ui->file_name_combo->model()));
 
 
     completer=new QCompleter(this->ui->comment_pos_combo);
-    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->comment_pos_combo->model());
     this->ui->comment_pos_combo->setCompleter(completer);
+    this->ui->comment_pos_combo->setValidator(new grader_combo_validator(this->ui->comment_pos_combo,this->ui->comment_pos_combo->model()));
 
 }
 
@@ -68,33 +71,44 @@ grader_editor::~grader_editor()
 
 void grader_editor::on_next_btn_clicked()
 {
-    put_marks(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString());
-    put_comment(false,this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    if(this->current_index+2==this->filesList.length())
-        this->ui->next_btn->setEnabled(false);
-    this->ui->prev_btn->setEnabled(true);
-    this->current_index++;
-    this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    setup_marks_widget(this->current_index);
-    this->ui->comment_pos_combo->setCurrentIndex(0);
-    this->previous_comment_pos_index=0;
-    this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
-
+    generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    if(this->tex_errors!=NULL){
+        QMessageBox::warning(
+                    this,
+                    tr("Grader"),
+                    tr("Please fix all errors before proceding"));
+    }else{
+        if(this->current_index+2==this->filesList.length())
+            this->ui->next_btn->setEnabled(false);
+        this->ui->prev_btn->setEnabled(true);
+        this->current_index++;
+        this->ui->file_name_combo->setCurrentIndex(this->current_index);
+        setup_marks_widget(this->current_index);
+        this->ui->comment_pos_combo->setCurrentIndex(0);
+        this->previous_comment_pos_index=0;
+        this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
+    }
 }
 
 void grader_editor::on_prev_btn_clicked()
 {
-    put_marks(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString());
-    put_comment(false,this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    if(this->current_index<=1)
-        this->ui->prev_btn->setEnabled(false);
-    this->ui->next_btn->setEnabled(true);
-    this->current_index--;
-    this->ui->file_name_combo->setCurrentIndex(this->current_index);
-    setup_marks_widget(this->current_index);
-    this->ui->comment_pos_combo->setCurrentIndex(0);
-    this->previous_comment_pos_index=0;
-    this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
+    generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    if(this->tex_errors!=NULL){
+        QMessageBox::warning(
+                    this,
+                    tr("Grader"),
+                    tr("Please fix all errors before proceding"));
+    }else{
+        if(this->current_index<=1)
+            this->ui->prev_btn->setEnabled(false);
+        this->ui->next_btn->setEnabled(true);
+        this->current_index--;
+        this->ui->file_name_combo->setCurrentIndex(this->current_index);
+        setup_marks_widget(this->current_index);
+        this->ui->comment_pos_combo->setCurrentIndex(0);
+        this->previous_comment_pos_index=0;
+        this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
+    }
 }
 
 void grader_editor::on_preview_btn_clicked()
@@ -109,22 +123,30 @@ void grader_editor::on_preview_btn_clicked()
 
 void grader_editor::on_file_name_combo_activated(int index)
 {
-    put_marks(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString());
-    put_comment(false,this->filesList[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    this->current_index=index;
-    if(this->current_index==0)
-        this->ui->prev_btn->setEnabled(false);
-    else
-        this->ui->prev_btn->setEnabled(true);
-    if(this->current_index+1>=this->filesList.length())
-        this->ui->next_btn->setEnabled(false);
-    else
-        this->ui->next_btn->setEnabled(true);
-    setup_marks_widget(this->current_index);
-    this->ui->comment_pos_combo->setCurrentIndex(0);
-    this->previous_comment_pos_index=0;
-    this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
-
+    if(index!=this->current_index){
+        generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+        if(this->tex_errors!=NULL){
+            this->ui->file_name_combo->setCurrentIndex(this->current_index);
+            QMessageBox::warning(
+                        this,
+                        tr("Grader"),
+                        tr("Please fix all errors before proceding"));
+        }else{
+            this->current_index=index;
+            if(this->current_index==0)
+                this->ui->prev_btn->setEnabled(false);
+            else
+                this->ui->prev_btn->setEnabled(true);
+            if(this->current_index+1>=this->filesList.length())
+                this->ui->next_btn->setEnabled(false);
+            else
+                this->ui->next_btn->setEnabled(true);
+            setup_marks_widget(this->current_index);
+            this->ui->comment_pos_combo->setCurrentIndex(0);
+            this->previous_comment_pos_index=0;
+            this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->filesList[this->current_index],"t"));
+        }
+    }
 }
 
 void grader_editor::on_fix_file_btn_clicked()

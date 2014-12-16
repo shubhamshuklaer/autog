@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QTextStream>
 #include "constants.h"
+#include "grader_combo_validator.h"
 
 QString latex_compile_command;
 
@@ -19,10 +20,11 @@ grader_project_load::grader_project_load(QWidget *parent) :
 {
     ui->setupUi(this);
     QCompleter *module_completer=new QCompleter(this->ui->select_module_combo);
-    module_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    module_completer->setCompletionMode(QCompleter::PopupCompletion);
     module_completer->setCaseSensitivity(Qt::CaseInsensitive);
     module_completer->setModel(this->ui->select_module_combo->model());
     this->ui->select_module_combo->setCompleter(module_completer);
+    this->ui->select_module_combo->setValidator(new grader_combo_validator(this,this->ui->select_module_combo->model()));
 }
 
 grader_project_load::~grader_project_load()
