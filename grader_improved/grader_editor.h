@@ -52,6 +52,8 @@ private slots:
 
     void on_comment_pos_combo_activated(int index);
 
+    void set_tex_error(QString error);
+
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);

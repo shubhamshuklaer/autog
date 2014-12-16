@@ -152,7 +152,9 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     tex_error_p1.waitForFinished(-1);
     tex_error_p2.start("grep",QStringList()<<temp_grep_string);
     tex_error_p2.waitForFinished(-1);
-    return tex_error_p2.readAllStandardOutput();
+    QString error=tex_error_p2.readAllStandardOutput();
+    emit send_error(error);
+    return error;
 }
 
 

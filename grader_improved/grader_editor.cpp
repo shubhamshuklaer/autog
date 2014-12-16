@@ -35,6 +35,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->file_sys_interface=new grader_file_sys(NULL,this->main_tex_dir_name,this->out_dir_name);
     //QObject::moveToThread: Cannot move objects with a parent
     this->file_sys_interface->moveToThread(this->file_sys_thread);
+    connect(this->file_sys_interface,SIGNAL(send_error(QString)),this,SLOT(set_tex_error(QString)));
     this->file_sys_thread->start();
 
     setup_marks_widget(0);
@@ -234,15 +235,19 @@ void grader_editor::generate_pdf(bool async,QString file_name,QString marks,QStr
         QCoreApplication::removePostedEvents(this->file_sys_interface);
         method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString,file_name),Q_ARG(QString,marks),Q_ARG(QString,comment_text),Q_ARG(QString,comment_pos));
     }else{
-        this->tex_errors_lock.lock();
-        this->tex_errors=this->file_sys_interface->generate_pdf(file_name,marks,comment_text,comment_pos);
-        if(this->tex_errors!=""){
-            this->ui->see_errors_btn->setEnabled(true);
-            this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
-        }else{
-            this->ui->see_errors_btn->setEnabled(false);
-            this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
-        }
-        this->tex_errors_lock.unlock();
+        this->file_sys_interface->generate_pdf(file_name,marks,comment_text,comment_pos);
     }
+}
+
+void grader_editor::set_tex_error(QString error){
+    this->tex_errors_lock.lock();
+    this->tex_errors=error;
+    if(this->tex_errors!=""){
+        this->ui->see_errors_btn->setEnabled(true);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
+    }else{
+        this->ui->see_errors_btn->setEnabled(false);
+        this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
+    }
+    this->tex_errors_lock.unlock();
 }

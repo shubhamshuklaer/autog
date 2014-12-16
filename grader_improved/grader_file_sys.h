@@ -18,6 +18,7 @@ public:
     QString main_tex_dir_name,out_dir_name;
 
 signals:
+    void send_error(QString error);
 
 public slots:
 
