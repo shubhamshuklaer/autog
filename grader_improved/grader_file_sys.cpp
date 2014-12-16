@@ -73,8 +73,11 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     process.waitForFinished(-1);
 //    comment=comment.simplified();
     comment=escape_string(comment);
-    QString temp="s:\\\\putcomment\\\["+comment_pos+"]{.*:\\\\putcomment\\\["+comment_pos+"]{"+comment+"}:";
-//    qDebug()<<temp;
+    QString temp;
+    if(comment_pos=="c")
+        temp="s:\\\\customcomment{.*:\\\\customcomment{"+comment+"}:";
+    else
+        temp="s:\\\\putcomment\\\["+comment_pos+"]{.*:\\\\putcomment\\\["+comment_pos+"]{"+comment+"}:";
     process.setStandardInputFile(this->out_dir_name+"/temp2.tex");
     process.setStandardOutputFile(this->out_dir_name+"/"+file_name+".tex",QIODevice::Truncate);
     process.start("sed",QStringList() << temp);
