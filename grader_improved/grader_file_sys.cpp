@@ -3,6 +3,10 @@
 #include <QProcess>
 #include <QDebug>
 #include <QThread>
+#include <QFile>
+#include <QTextStream>
+#include <QRegularExpression>
+#include <QMessageBox>
 
 extern QString latex_compile_command;
 
@@ -45,47 +49,6 @@ void grader_file_sys::put_marks(QString file_name, QString marks){
     QProcess process1;
     process1.setWorkingDirectory(this->out_dir_name);
     process1.start("rm temp1.tex");
-    process1.waitForFinished(-1);
-    this->file_mutex.unlock();
-}
-
-
-QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
-    QProcess process;
-    process.setWorkingDirectory(this->out_dir_name);
-    process.setStandardInputFile(this->out_dir_name+"/"+file_name+".tex");
-    this->file_mutex.lock();
-    QString aa = "(?<=putcomment\\\["+comment_pos+"]{).*(?=})";
-    process.start("grep", QStringList() << "-oP" << aa);
-    process.waitForFinished(-1); // will wait forever until finished
-
-    QString stdout = process.readAllStandardOutput();
-//    QString stderr = process.readAllStandardError();
-    this->file_mutex.unlock();
-    return stdout;
-}
-
-void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos){
-    QProcess process;
-    process.setWorkingDirectory(this->out_dir_name);
-    this->file_mutex.lock();
-    process.start("cp", QStringList() << file_name+".tex" << "temp2.tex" );
-    process.waitForFinished(-1);
-//    comment=comment.simplified();
-    comment=escape_string(comment);
-    QString temp;
-    if(comment_pos=="c")
-        temp="s:\\\\customcomment{.*:\\\\customcomment{"+comment+"}:";
-    else
-        temp="s:\\\\putcomment\\\["+comment_pos+"]{.*:\\\\putcomment\\\["+comment_pos+"]{"+comment+"}:";
-    process.setStandardInputFile(this->out_dir_name+"/temp2.tex");
-    process.setStandardOutputFile(this->out_dir_name+"/"+file_name+".tex",QIODevice::Truncate);
-    process.start("sed",QStringList() << temp);
-    process.waitForFinished(-1);
-    process.kill();
-    QProcess process1;
-    process1.setWorkingDirectory(this->out_dir_name);
-    process1.start("rm temp2.tex");
     process1.waitForFinished(-1);
     this->file_mutex.unlock();
 }
@@ -158,15 +121,62 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
 }
 
 
-QString grader_file_sys::escape_string(QString comment){
-    comment=comment.simplified();
-//    comment=comment.trimmed();
-    comment.replace("\\","\\\\");
-    comment.replace("&","\\&");
-    comment.replace(":","\\:");
-//    QString temp=;
-//    qDebug() <<temp;
-//    comment.replace(QRegExp("[\\n\\t\\r]"),"\\\\n");
-//    qDebug() <<comment;
-    return comment;
+
+void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos){
+    QFile file(this->out_dir_name+"/"+file_name+".tex");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(
+                    NULL,
+                    tr("Grader"),
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+        return ;
+    }
+    QTextStream input(&file);
+    QString content=input.readAll();
+    file.close();
+    QRegularExpression pattern;
+    QString replacement;
+    if(comment_pos=="c"){
+        pattern=QRegularExpression("\\\\customcomment{[^}]*}");
+        replacement="\\customcomment{"+comment+"}";
+    }else{
+        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{[^}]*}");
+        replacement="\\putcomment["+comment_pos+"]{"+comment+"}";
+    }
+    content.replace(pattern,replacement);
+    this->file_mutex.lock();
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+        QMessageBox::warning(
+                    NULL,
+                    tr("Grader"),
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+        return ;
+    }
+    QTextStream input1(&file);
+    input1<<content;
+    file.flush();
+    file.close();
+    this->file_mutex.unlock();
+}
+
+QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
+    QFile file(this->out_dir_name+"/"+file_name+".tex");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(
+                    NULL,
+                    tr("Grader"),
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+        return QString();
+    }
+    QTextStream input(&file);
+    QString content=input.readAll();
+    file.close();
+    QRegularExpression pattern;
+    if(comment_pos=="c"){
+        pattern=QRegularExpression("\\\\customcomment{([^}]*)}");
+    }else{
+        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{([^}]*)}");
+    }
+    QRegularExpressionMatch comment_match=pattern.match(content);
+    return comment_match.captured(1);
 }
