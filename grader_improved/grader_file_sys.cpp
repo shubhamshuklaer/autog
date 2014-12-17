@@ -137,11 +137,13 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     QRegularExpression pattern;
     QString replacement;
     if(comment_pos=="c"){
-        pattern=QRegularExpression("\\\\customcomment{[^}]*}");
-        replacement="\\customcomment{"+comment+"}";
+        //(?!foo) is negative lookahed
+        pattern=QRegularExpression("\\\\customcomment{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
+        replacement="\\customcomment{"+comment+"}\\nextcommandmarker";
     }else{
-        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{[^}]*}");
-        replacement="\\putcomment["+comment_pos+"]{"+comment+"}";
+        //(?!foo) is negative lookahed
+        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
+        replacement="\\putcomment["+comment_pos+"]{"+comment+"}\\nextcommandmarker";
     }
     content.replace(pattern,replacement);
     this->file_mutex.lock();
@@ -173,9 +175,11 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
     file.close();
     QRegularExpression pattern;
     if(comment_pos=="c"){
-        pattern=QRegularExpression("\\\\customcomment{([^}]*)}");
+        //(?!foo) is negative lookahed
+        pattern=QRegularExpression("\\\\customcomment{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
     }else{
-        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{([^}]*)}");
+        //(?!foo) is negative lookahed
+        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
     }
     QRegularExpressionMatch comment_match=pattern.match(content);
     return comment_match.captured(1);
