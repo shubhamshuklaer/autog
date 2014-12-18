@@ -6,11 +6,15 @@
 #include <QCompleter>
 #include "grader_marks_widget.h"
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
 #include "constants.h"
 #include <QMetaMethod>
 #include <QMutex>
 #include <QCoreApplication>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QRegularExpression>
 #include "grader_combo_validator.h"
 
 
@@ -66,6 +70,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
 
 grader_editor::~grader_editor()
 {
+    this->file_sys_thread->wait();
     delete ui;
 }
 
@@ -114,10 +119,9 @@ void grader_editor::on_prev_btn_clicked()
 void grader_editor::on_preview_btn_clicked()
 {
     generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    QProcess process;
-    process.setWorkingDirectory(this->main_tex_dir_name);
-    process.start("gnome-open", QStringList() << const_main_pdf_name+".pdf");
-    process.waitForFinished(-1);
+    if(!QDesktopServices::openUrl(QUrl("file:///"+this->main_tex_dir_name+"/"+const_main_pdf_name+".pdf", QUrl::TolerantMode))){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->main_tex_dir_name+"/"+const_main_pdf_name+".pdf");
+    }
 }
 
 
@@ -149,27 +153,82 @@ void grader_editor::on_file_name_combo_activated(int index)
     }
 }
 
+//void grader_editor::on_fix_file_btn_clicked()
+//{
+//    QProcess process;
+//    process.setWorkingDirectory(this->out_dir_name);
+//    process.start("cp",QStringList()<<this->sub_tex_name<<this->filesList[this->current_index]+".tex");
+//    process.waitForFinished(-1);
+//    qDebug() <<process.readAllStandardError();
+//    //putting put page
+//    QString file_id=this->filesList[this->current_index];
+//    QProcess process1;
+//    process1.setWorkingDirectory(this->out_dir_name);
+//    process1.start("cp", QStringList() << this->filesList[this->current_index]+".tex" <<"temp.tex");
+//    process1.waitForFinished(-1);
+//    process1.setStandardInputFile(this->out_dir_name+"/temp.tex");
+//    process1.setStandardOutputFile(this->out_dir_name+"/"+this->filesList[this->current_index]+".tex",QIODevice::Truncate);
+//    QString temp1="s:\\\\putpage{.*:\\\\putpage{"+file_id+"}:";
+//    process1.start("sed", QStringList() << temp1 );
+//    process1.waitForFinished(-1);
+//    process1.kill();
+//    generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+//}
+
+
 void grader_editor::on_fix_file_btn_clicked()
 {
-    QProcess process;
-    process.setWorkingDirectory(this->out_dir_name);
-    process.start("cp",QStringList()<<this->sub_tex_name<<this->filesList[this->current_index]+".tex");
-    process.waitForFinished(-1);
-    qDebug() <<process.readAllStandardError();
+    QDir out_dir(this->out_dir_name);
+    if(out_dir.exists(this->filesList[this->current_index]+".tex")){
+        if(!out_dir.remove(this->filesList[this->current_index]+".tex")){
+            QMessageBox::warning(
+                        this,
+                        tr("Error"),
+                        tr("couldn't file ")+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex"+tr(" exists and couldn't be removed for overwriting"));
+            return;
+        }
+    }
+
+    if(!QFile::copy(this->sub_tex_name,this->out_dir_name+"/"+this->filesList[this->current_index]+".tex")){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't copy file from ")+this->sub_tex_name+tr(" to ")+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex");
+        return;
+    }
     //putting put page
-    QString file_id=this->filesList[this->current_index];
-    QProcess process1;
-    process1.setWorkingDirectory(this->out_dir_name);
-    process1.start("cp", QStringList() << this->filesList[this->current_index]+".tex" <<"temp.tex");
-    process1.waitForFinished(-1);
-    process1.setStandardInputFile(this->out_dir_name+"/temp.tex");
-    process1.setStandardOutputFile(this->out_dir_name+"/"+this->filesList[this->current_index]+".tex",QIODevice::Truncate);
-    QString temp1="s:\\\\putpage{.*:\\\\putpage{"+file_id+"}:";
-    process1.start("sed", QStringList() << temp1 );
-    process1.waitForFinished(-1);
-    process1.kill();
+
+    QFile sub_tex_file(this->out_dir_name+"/"+this->filesList[this->current_index]+".tex");
+
+    if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex"+tr(" for read"));
+        return;
+    }
+
+    QTextStream sub_tex_input_stream(&sub_tex_file);
+    QString sub_tex_content=sub_tex_input_stream.readAll();
+    sub_tex_file.close();
+
+    if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex"+tr(" for read"));
+        return;
+    }
+
+
+    QTextStream sub_tex_output_stream(&sub_tex_file);
+    QRegularExpression put_page_pattern("\\\\putpage{.*");
+    qDebug()<<"Sub tex content"<<sub_tex_content;
+    sub_tex_content.replace(put_page_pattern,"\\putpage{"+this->filesList[this->current_index]+"}");
+    qDebug()<<sub_tex_content;
+    sub_tex_output_stream<<sub_tex_content;
+
+    sub_tex_file.flush();
+    sub_tex_file.close();
+
     generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
 }
+
+
 
 void grader_editor::on_see_errors_btn_clicked()
 {
@@ -198,10 +257,9 @@ void grader_editor::setup_marks_widget(int index){
 
 void grader_editor::on_open_tex_btn_clicked()
 {
-    QProcess process;
-    process.setWorkingDirectory(this->out_dir_name);
-    process.start("gnome-open", QStringList()<<this->filesList[this->current_index]+".tex");
-    process.waitForFinished(-1);
+    if(!QDesktopServices::openUrl(QUrl("file:///"+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex", QUrl::TolerantMode))){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+this->filesList[this->current_index]+".tex");
+    }
 }
 
 void grader_editor::on_marks_text_textChanged(){

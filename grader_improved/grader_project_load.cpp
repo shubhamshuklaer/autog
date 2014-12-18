@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QFile>
 #include <QTextStream>
+#include <QRegularExpression>
 #include "constants.h"
 #include "grader_combo_validator.h"
 
@@ -113,139 +114,6 @@ QStringList grader_project_load::get_marks_denominations(){
     return this->marks_denominations;
 }
 
-bool grader_project_load::setup_module(){
-    QString module_dir_name=this->project_path+"/"+this->module_name;
-    QString sub_tex_path=this->project_path+"/"+const_sub_tex_name;
-    QString top_tex_path=this->project_path+"/"+const_top_tex_name;
-    QString bursts_dir_path=this->project_path+"/"+const_bursts_dir_name;
-
-    QProcess process;
-    process.setWorkingDirectory(module_dir_name);
-    process.start("mkdir "+const_out_dir_name);
-    process.waitForFinished(-1);
-    process.setWorkingDirectory(module_dir_name+"/"+const_out_dir_name);
-
-    QDir project_dir(this->project_path);
-
-    if(!project_dir.exists(const_top_tex_name)){
-        QMessageBox::warning(
-                    this,
-                    tr("Error"),
-                    tr("couldn't find preamble file ")+this->project_path+"/"+const_top_tex_name);
-        return false;
-    }
-    if(!project_dir.exists(const_sub_tex_name)){
-        QMessageBox::warning(
-                    this,
-                    tr("Error"),
-                    tr("couldn't find sub file ")+this->project_path+"/"+const_sub_tex_name);
-        return false;
-    }
-
-    if(!project_dir.exists(const_bursts_dir_name)){
-        QMessageBox::warning(
-                    this,
-                    tr("Error"),
-                    tr("couldn't find bursts dir ")+this->project_path+"/"+const_bursts_dir_name);
-        return false;
-    }
-
-
-    QFile module_config_file(this->project_path+"/"+this->module_name+"/"+module_config_file_name);
-    if(!module_config_file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        QMessageBox::warning(this,tr("Error"),tr("couldn't open module config file ")+this->project_path+"/"+this->module_name+"/"+module_config_file_name);
-        return false;
-    }
-
-
-    QTextStream in(&module_config_file);
-    QString temp_line;
-    QStringList temp_split;
-    while(!in.atEnd()){
-        temp_line=in.readLine();
-        if(temp_line!=NULL){
-            temp_split=temp_line.split(id_marks_delimiter);
-            this->filesList<<temp_split[0];
-            this->marks_denominations<<temp_split[1];
-        }
-    }
-
-    module_config_file.close();
-
-
-    if(this->filesList.length()==0){
-        QMessageBox::warning(this,tr("Error"),tr("No id's in the module config file ")+this->project_path+"/"+this->module_name+"/"+module_config_file_name);
-        return false;
-    }
-
-    for(int i=0;i<this->filesList.length();i++){
-        QString temp="bash -c \"if \[ ! -f "+this->filesList[i]+".tex \]; then cp "+sub_tex_path+" "+filesList[i]+".tex; fi;\"";
-        process.start(temp);
-        process.waitForFinished(-1);
-    }
-
-
-    process.setWorkingDirectory(module_dir_name);
-    process.start("cp",QStringList() << top_tex_path << const_main_pdf_name+".tex");
-    process.waitForFinished(-1);
-
-    process.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
-    process.start("echo",QStringList() << "\\begin{document}");
-    process.waitForFinished(-1);
-    process.kill();
-    for(int i=0;i<this->filesList.length();i++){
-        QProcess process1;
-        process1.setWorkingDirectory(module_dir_name);
-        process1.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
-        process1.start("echo",QStringList() << "\\include{"+const_out_dir_name+"/"+this->filesList[i]+"}");
-        process1.waitForFinished(-1);
-        process1.kill();
-    }
-    QProcess process2;
-    process2.setWorkingDirectory(module_dir_name);
-    process2.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Append);
-    process2.start("echo",QStringList() << "\\end{document}");
-    process2.waitForFinished(-1);
-    process2.kill();
-
-    QProcess process3;
-    process3.setWorkingDirectory(module_dir_name);
-    process3.start("cp",QStringList() << const_main_pdf_name+".tex" << "temp.tex");
-    process3.waitForFinished(-1);
-    process3.setStandardInputFile(module_dir_name+"/temp.tex");
-    process3.setStandardOutputFile(module_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Truncate);
-    QString temp="s:\\\\newcommand{\\\\burstsdir}{.*:\\\\newcommand{\\\\burstsdir}{"+bursts_dir_path+"}:";
-    process3.start("sed",QStringList()<<temp);
-    process3.waitForFinished(-1);
-    process3.kill();
-
-    QProcess process4;
-    process4.setWorkingDirectory(module_dir_name);
-    process4.start("rm", QStringList() << "temp.tex");
-    process4.waitForFinished(-1);
-
-
-    QString temp1;
-    for(int i=0;i<this->filesList.length();i++){
-        QProcess process1;
-        process1.setWorkingDirectory(module_dir_name+"/"+const_out_dir_name);
-        process1.start("cp", QStringList() << this->filesList[i]+".tex" <<"temp.tex");
-        process1.waitForFinished(-1);
-        process1.setStandardInputFile(module_dir_name+"/"+const_out_dir_name+"/temp.tex");
-        process1.setStandardOutputFile(module_dir_name+"/"+const_out_dir_name+"/"+this->filesList[i]+".tex",QIODevice::Truncate);
-        temp1="s:\\\\putpage{.*:\\\\putpage{"+this->filesList[i]+"}:";
-        process1.start("sed", QStringList() << temp1 );
-        process1.waitForFinished(-1);
-        process1.kill();
-    }
-
-    QProcess process5;
-    process5.setWorkingDirectory(module_dir_name+"/"+const_out_dir_name);
-    process5.start("rm temp.tex");
-    process5.waitForFinished(-1);
-    return true;
-}
-
 
 void grader_project_load::load_settings(){
     latex_compile_command=QString();
@@ -278,3 +146,197 @@ void grader_project_load::load_settings(){
     }
     qDebug() <<latex_compile_command;
 }
+
+
+bool grader_project_load::setup_module(){
+    QString module_dir_name=this->project_path+"/"+this->module_name;
+    QString sub_tex_path=this->project_path+"/"+const_sub_tex_name;
+    QString top_tex_path=this->project_path+"/"+const_top_tex_name;
+    QString bursts_dir_path=this->project_path+"/"+const_bursts_dir_name;
+    QString out_dir_name=module_dir_name+"/"+const_out_dir_name;
+
+    QDir project_dir(this->project_path);
+
+    if(!project_dir.exists(const_top_tex_name)){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't find preamble file ")+this->project_path+"/"+const_top_tex_name);
+        return false;
+    }
+    if(!project_dir.exists(const_sub_tex_name)){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't find sub file ")+this->project_path+"/"+const_sub_tex_name);
+        return false;
+    }
+
+    if(!project_dir.exists(const_bursts_dir_name)){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't find bursts dir ")+this->project_path+"/"+const_bursts_dir_name);
+        return false;
+    }
+
+
+    QDir module_dir(module_dir_name);//this exists as checked in start btn slot
+
+    if(!(module_dir.exists(const_out_dir_name)||module_dir.mkdir(const_out_dir_name))){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't create output dir ")+out_dir_name);
+        return false;
+    }
+
+    QFile module_config_file(this->project_path+"/"+this->module_name+"/"+module_config_file_name);
+    if(!module_config_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open module config file ")+this->project_path+"/"+this->module_name+"/"+module_config_file_name);
+        return false;
+    }
+
+
+    QTextStream in(&module_config_file);
+    QString temp_line;
+    QStringList temp_split;
+    while(!in.atEnd()){
+        temp_line=in.readLine();
+        if(temp_line!=NULL){
+            temp_split=temp_line.split(id_marks_delimiter);
+            this->filesList<<temp_split[0];
+            this->marks_denominations<<temp_split[1];
+        }
+    }
+
+    module_config_file.close();
+
+
+    if(this->filesList.length()==0){
+        QMessageBox::warning(this,tr("Error"),tr("No id's in the module config file ")+this->project_path+"/"+this->module_name+"/"+module_config_file_name);
+        return false;
+    }
+
+
+    QDir out_dir(out_dir_name);
+
+    for(int i=0;i<this->filesList.length();i++){
+        if(!out_dir.exists(out_dir_name+"/"+this->filesList[i]+".tex")){
+            if(!QFile::copy(sub_tex_path,out_dir_name+"/"+this->filesList[i]+".tex")){
+                //couldn't copy
+                QMessageBox::warning(
+                            this,
+                            tr("Error"),
+                            tr("couldn't copy file from ")+sub_tex_path+tr(" to ")+out_dir_name+"/"+this->filesList[i]+".tex");
+                return false;
+            }
+        }
+    }
+
+    if(module_dir.exists(const_main_pdf_name+".tex")){
+        if(!module_dir.remove(const_main_pdf_name+".tex")){
+            QMessageBox::warning(
+                        this,
+                        tr("Error"),
+                        tr("couldn't file ")+module_dir_name+"/"+const_main_pdf_name+".tex" +tr(" exists and couldn't be removed for overwriting"));
+            return false;
+        }
+    }
+
+    if(!QFile::copy(top_tex_path,module_dir_name+"/"+const_main_pdf_name+".tex")){
+        QMessageBox::warning(
+                    this,
+                    tr("Error"),
+                    tr("couldn't copy file from ")+top_tex_path+tr(" to ")+module_dir_name+"/"+const_main_pdf_name+".tex");
+        return false;
+    }
+
+    QStringList put_into_main_pdf;
+    put_into_main_pdf<<"\\begin{document}";
+    for(int i=0;i<this->filesList.length();i++){
+        put_into_main_pdf<<"\\include{"+const_out_dir_name+"/"+this->filesList[i]+"}";
+    }
+    put_into_main_pdf<< "\\end{document}";
+
+    QFile main_pdf_tex_file(module_dir_name+"/"+const_main_pdf_name+".tex");
+    if(!main_pdf_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+module_dir_name+"/"+const_main_pdf_name+".tex"+tr(" for read"));
+        return false;
+    }
+
+
+    QTextStream main_pdf_tex_input_stream(&main_pdf_tex_file);
+    QString main_pdf_content=main_pdf_tex_input_stream.readAll();
+    main_pdf_tex_file.close();
+
+
+    if(!main_pdf_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+module_dir_name+"/"+const_main_pdf_name+".tex"+tr(" for read"));
+        return false;
+    }
+
+
+    QTextStream main_pdf_tex_output_stream(&main_pdf_tex_file);
+    QRegularExpression burst_path_pattern("\\\\newcommand{\\\\burstsdir}{.*");
+    main_pdf_content.replace(burst_path_pattern,"\\newcommand{\\burstsdir}{"+bursts_dir_path+"}");
+
+    main_pdf_tex_output_stream<<main_pdf_content<<"\n";
+
+    //const reference makes it faster as we are not creating any new object
+    foreach(const QString &put_temp,put_into_main_pdf)
+        main_pdf_tex_output_stream<<put_temp<<"\n";
+
+    main_pdf_tex_file.flush();
+    main_pdf_tex_file.close();
+
+    for(int i=0;i<this->filesList.length();i++){
+        QFile sub_tex_file(out_dir_name+"/"+this->filesList[i]+".tex");
+
+        if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->filesList[i]+".tex"+tr(" for read"));
+            return false;
+        }
+
+        QTextStream sub_tex_input_stream(&sub_tex_file);
+        QString sub_tex_content=sub_tex_input_stream.readAll();
+        sub_tex_file.close();
+
+        if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->filesList[i]+".tex"+tr(" for read"));
+            return false;
+        }
+
+
+        QTextStream sub_tex_output_stream(&sub_tex_file);
+        QRegularExpression put_page_pattern("\\\\putpage{.*");
+        qDebug()<<"Sub tex content"<<sub_tex_content;
+        sub_tex_content.replace(put_page_pattern,"\\putpage{"+this->filesList[i]+"}");
+        qDebug()<<sub_tex_content;
+        sub_tex_output_stream<<sub_tex_content;
+
+        sub_tex_file.flush();
+        sub_tex_file.close();
+    }
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
