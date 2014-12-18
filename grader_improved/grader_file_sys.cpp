@@ -19,108 +19,55 @@ grader_file_sys::grader_file_sys(QObject *parent,QString main_tex_dir_name,QStri
 
 
 QString grader_file_sys::get_marks(QString file_name){
-    QProcess process;
-    process.setWorkingDirectory(this->out_dir_name);
-    process.setStandardInputFile(this->out_dir_name+"/"+file_name+".tex");
+    QFile sub_tex_file(this->out_dir_name+"/"+file_name+".tex");
+    QString marks=QString();
     this->file_mutex.lock();
-    process.start("grep", QStringList() << "-oP" << "(?<=putmarks{).*(?=})");
-    process.waitForFinished(-1); // will wait forever until finished
-
-    QString stdout = process.readAllStandardOutput();
-//    QString stderr = process.readAllStandardError();
-    this->file_mutex.unlock();
-    return stdout.simplified();
+    if(sub_tex_file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        QTextStream sub_tex_stream(&sub_tex_file);
+        QString sub_tex_content=sub_tex_stream.readAll();
+        sub_tex_file.close();
+        this->file_mutex.unlock();
+        QRegularExpression get_marks_pattern("\\\\putmarks{([^}]*)}");
+        marks=get_marks_pattern.match(sub_tex_content).captured(1);
+    }else{
+        this->file_mutex.unlock();
+        QMessageBox::warning(NULL,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" to read marks"));
+    }
+    return marks.simplified();
 }
 
 void grader_file_sys::put_marks(QString file_name, QString marks){
-    QProcess process;
-    marks=marks.simplified();
-    process.setWorkingDirectory(this->out_dir_name);
+    QFile file(this->out_dir_name+"/"+file_name+".tex");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::warning(
+                    NULL,
+                    tr("Grader"),
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex" +tr("for reading marks"));
+        return ;
+    }
+    QTextStream input(&file);
+    QString content=input.readAll();
+    file.close();
+    QRegularExpression pattern;
+    QString replacement;
+    pattern=QRegularExpression("\\\\putmarks{[^}]*}");
+    replacement="\\putmarks{"+marks.simplified()+"}";
+    content.replace(pattern,replacement);
     this->file_mutex.lock();
-    process.start("cp", QStringList() << file_name+".tex" << "temp1.tex" );
-    process.waitForFinished(-1);
-    marks=marks.simplified();
-    QString temp="s:\\\\putmarks{.*:\\\\putmarks{"+marks+"}:";
-    process.setStandardInputFile(this->out_dir_name+"/temp1.tex");
-    process.setStandardOutputFile(this->out_dir_name+"/"+file_name+".tex",QIODevice::Truncate);
-    process.start("sed",QStringList() << temp);
-    process.waitForFinished(-1);
-    process.kill();
-    QProcess process1;
-    process1.setWorkingDirectory(this->out_dir_name);
-    process1.start("rm temp1.tex");
-    process1.waitForFinished(-1);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+        QMessageBox::warning(
+                    NULL,
+                    tr("Grader"),
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for writing marks"));
+        this->file_mutex.unlock();
+        return ;
+    }
+    QTextStream input1(&file);
+    input1<<content;
+    file.flush();
+    file.close();
     this->file_mutex.unlock();
 }
-
-
-void grader_file_sys::include_only(bool is_include_only,QString file_name){
-    QProcess process;
-    process.setWorkingDirectory(this->main_tex_dir_name);
-    process.setStandardInputFile(this->main_tex_dir_name+"/"+const_main_pdf_name+".tex");
-    this->main_file_mutex.lock();
-    process.start("grep",QStringList() << "\\includeonly{.*");
-    process.waitForFinished(-1);
-    QProcess process1;
-    process1.setWorkingDirectory(this->main_tex_dir_name);
-    process1.start("cp "+const_main_pdf_name+".tex temp_pdf.tex");
-    process1.waitForFinished(-1);
-    process1.setStandardInputFile(this->main_tex_dir_name+"/temp_pdf.tex");
-    process1.setStandardOutputFile(this->main_tex_dir_name+"/"+const_main_pdf_name+".tex",QIODevice::Truncate);
-    QString temp;
-    if(process.readAllStandardOutput()==""){
-        if(is_include_only){
-            temp="1i\\ \\\\includeonly{"+const_out_dir_name+"\\\/"+file_name+"}";
-            process1.start("sed",QStringList()<<temp);
-            process1.waitForFinished(-1);
-            process1.kill();
-        }
-    }else{
-        if(is_include_only)
-            temp="s:\\\\includeonly{.*:\\\\includeonly{"+const_out_dir_name+"\\\/"+file_name+"}:";
-        else
-            temp="s:\\\\includeonly{.*::";
-        process1.start("sed",QStringList()<<temp);
-        process1.waitForFinished(-1);
-        process1.kill();
-
-    }
-    QProcess process2;
-    process2.setWorkingDirectory(this->main_tex_dir_name);
-    process2.start("rm temp_pdf.tex");
-    process2.waitForFinished(-1);
-    this->main_file_mutex.unlock();
-}
-
-
-QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
-    bool is_include_only=true;
-    put_marks(file_name,marks);
-    put_comment(file_name,comment_text,comment_pos);
-    qDebug() << "File sys thread"<<QThread::currentThreadId();
-    qDebug()<<"Generate pdf";
-    include_only(is_include_only,file_name);
-    QProcess process;
-    process.setWorkingDirectory(this->main_tex_dir_name);
-    this->tex_mutex.lock();
-    process.start(latex_compile_command+" "+const_main_pdf_name+".tex");
-    process.waitForFinished(-1);
-    this->tex_mutex.unlock();
-    QProcess tex_error_p1,tex_error_p2;
-    QString temp_tex_errors;
-    temp_tex_errors=process.readAllStandardOutput();
-    tex_error_p1.setStandardOutputProcess(&tex_error_p2);
-    tex_error_p1.start("echo",QStringList() <<temp_tex_errors);
-    QString temp_grep_string=".*:[0-9]*:.*\\|^l.[0-9]*.*";
-    tex_error_p1.waitForFinished(-1);
-    tex_error_p2.start("grep",QStringList()<<temp_grep_string);
-    tex_error_p2.waitForFinished(-1);
-    QString error=tex_error_p2.readAllStandardOutput();
-    emit send_error(error);
-    return error;
-}
-
-
 
 void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos){
     QFile file(this->out_dir_name+"/"+file_name+".tex");
@@ -128,7 +75,7 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
         QMessageBox::warning(
                     NULL,
                     tr("Grader"),
-                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for reading comment"));
         return ;
     }
     QTextStream input(&file);
@@ -151,7 +98,8 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
         QMessageBox::warning(
                     NULL,
                     tr("Grader"),
-                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for writing comment"));
+        this->file_mutex.unlock();
         return ;
     }
     QTextStream input1(&file);
@@ -167,7 +115,7 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
         QMessageBox::warning(
                     NULL,
                     tr("Grader"),
-                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex");
+                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for reading comment"));
         return QString();
     }
     QTextStream input(&file);
@@ -183,4 +131,74 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
     }
     QRegularExpressionMatch comment_match=pattern.match(content);
     return comment_match.captured(1);
+}
+
+
+
+bool grader_file_sys::include_only(bool is_include_only,QString file_name){
+    this->main_file_mutex.lock();
+    QFile main_pdf_tex_file(this->main_tex_dir_name+"/"+const_main_pdf_name+".tex");
+    if(!main_pdf_tex_file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        QMessageBox::warning(NULL,tr("Error"),tr("couldn't open file ")+this->main_tex_dir_name+"/"+const_main_pdf_name+".tex"+tr(" to read"));
+        this->main_file_mutex.unlock();
+        return false;
+    }
+    QTextStream main_pdf_tex_input_stream(&main_pdf_tex_file);
+    QString main_pdf_tex_content=main_pdf_tex_input_stream.readAll();
+    main_pdf_tex_file.close();
+    QRegularExpression include_only_pattern("\\\\includeonly{.*");
+    QString replacement;
+    if(!main_pdf_tex_content.contains(include_only_pattern)){
+        if(is_include_only){
+            replacement="\\includeonly{"+const_out_dir_name+"/"+file_name+"}";
+            main_pdf_tex_content=replacement+"\n"+main_pdf_tex_content;
+        }
+    }else{
+        if(is_include_only){
+            main_pdf_tex_content.replace(include_only_pattern,"\\includeonly{"+const_out_dir_name+"/"+file_name+"}");
+        }else{
+            main_pdf_tex_content.replace(include_only_pattern,"\\includeonly{"+const_out_dir_name+"/"+file_name+"}");
+        }
+    }
+
+    if(!main_pdf_tex_file.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Truncate)){
+        QMessageBox::warning(NULL,tr("Error"),tr("couldn't open file ")+this->main_tex_dir_name+"/"+const_main_pdf_name+".tex"+tr(" to write"));
+        this->main_file_mutex.unlock();
+        return false;
+    }
+
+    QTextStream main_pdf_tex_output_stream(&main_pdf_tex_file);
+    main_pdf_tex_output_stream<<main_pdf_tex_content;
+    main_pdf_tex_file.flush();
+    main_pdf_tex_file.close();
+    this->main_file_mutex.unlock();
+    return true;
+}
+
+
+
+QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
+    bool is_include_only=true;
+    put_marks(file_name,marks);
+    put_comment(file_name,comment_text,comment_pos);
+    include_only(is_include_only,file_name);
+
+
+    QProcess process;
+    process.setWorkingDirectory(this->main_tex_dir_name);
+    this->tex_mutex.lock();
+    process.start(latex_compile_command+" "+const_main_pdf_name+".tex");
+    process.waitForFinished(-1);
+    this->tex_mutex.unlock();
+    QString temp_tex_errors;
+    temp_tex_errors=process.readAllStandardOutput();
+    QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*",QRegularExpression::MultilineOption);
+    QRegularExpressionMatchIterator error_iterator=error_pattern.globalMatch(temp_tex_errors);
+    QString error;
+    while (error_iterator.hasNext()) {
+        QRegularExpressionMatch match = error_iterator.next();
+        error=error+ match.captured(0)+"\n";
+    }
+    emit send_error(error);
+    return error;
 }

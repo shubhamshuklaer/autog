@@ -70,6 +70,7 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
 
 grader_editor::~grader_editor()
 {
+    this->file_sys_thread->quit();
     this->file_sys_thread->wait();
     delete ui;
 }
@@ -152,28 +153,6 @@ void grader_editor::on_file_name_combo_activated(int index)
         }
     }
 }
-
-//void grader_editor::on_fix_file_btn_clicked()
-//{
-//    QProcess process;
-//    process.setWorkingDirectory(this->out_dir_name);
-//    process.start("cp",QStringList()<<this->sub_tex_name<<this->filesList[this->current_index]+".tex");
-//    process.waitForFinished(-1);
-//    qDebug() <<process.readAllStandardError();
-//    //putting put page
-//    QString file_id=this->filesList[this->current_index];
-//    QProcess process1;
-//    process1.setWorkingDirectory(this->out_dir_name);
-//    process1.start("cp", QStringList() << this->filesList[this->current_index]+".tex" <<"temp.tex");
-//    process1.waitForFinished(-1);
-//    process1.setStandardInputFile(this->out_dir_name+"/temp.tex");
-//    process1.setStandardOutputFile(this->out_dir_name+"/"+this->filesList[this->current_index]+".tex",QIODevice::Truncate);
-//    QString temp1="s:\\\\putpage{.*:\\\\putpage{"+file_id+"}:";
-//    process1.start("sed", QStringList() << temp1 );
-//    process1.waitForFinished(-1);
-//    process1.kill();
-//    generate_pdf(false,this->filesList[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-//}
 
 
 void grader_editor::on_fix_file_btn_clicked()

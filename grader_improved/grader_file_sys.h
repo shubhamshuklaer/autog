@@ -24,7 +24,7 @@ public slots:
 
 private:
     QMutex file_mutex,tex_mutex,main_file_mutex;
-    void include_only(bool is_include_only,QString file_name);
+    bool include_only(bool is_include_only,QString file_name);
     QString escape_string(QString comment);
 
 };
