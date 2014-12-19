@@ -56,10 +56,11 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->marks_widget=NULL;
 
     this->file_sys_thread= new QThread(this);
-    this->file_sys_interface=new grader_file_sys(NULL,this->main_tex_dir_name,this->out_dir_name);
+    this->file_sys_interface=new grader_file_sys(NULL,this->main_tex_dir_name,this->out_dir_name,this->sub_tex_name);
     //QObject::moveToThread: Cannot move objects with a parent
     this->file_sys_interface->moveToThread(this->file_sys_thread);
-    connect(this->file_sys_interface,SIGNAL(send_error(QString)),this,SLOT(set_tex_error(QString)));
+    connect(this->file_sys_interface,SIGNAL(send_tex_error(QString)),this,SLOT(set_tex_error(QString)));
+    connect(this->file_sys_interface,SIGNAL(send_error(QString)),this,SLOT(display_error(QString)));
     this->file_sys_thread->start();
 
     setup_marks_widget(0);
@@ -176,53 +177,7 @@ void grader_editor::on_file_name_combo_activated(int index)
 
 void grader_editor::on_fix_file_btn_clicked()
 {
-    QDir out_dir(this->out_dir_name);
-    if(out_dir.exists(this->files_list[this->current_index]+".tex")){
-        if(!out_dir.remove(this->files_list[this->current_index]+".tex")){
-            QMessageBox::warning(
-                        this,
-                        tr("Error"),
-                        tr("couldn't file ")+this->out_dir_name+"/"+this->files_list[this->current_index]+".tex"+tr(" exists and couldn't be removed for overwriting"));
-            return;
-        }
-    }
-
-    if(!QFile::copy(this->sub_tex_name,this->out_dir_name+"/"+this->files_list[this->current_index]+".tex")){
-        QMessageBox::warning(
-                    this,
-                    tr("Error"),
-                    tr("couldn't copy file from ")+this->sub_tex_name+tr(" to ")+this->out_dir_name+"/"+this->files_list[this->current_index]+".tex");
-        return;
-    }
-    //putting put page
-
-    QFile sub_tex_file(this->out_dir_name+"/"+this->files_list[this->current_index]+".tex");
-
-    if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+this->files_list[this->current_index]+".tex"+tr(" for read"));
-        return;
-    }
-
-    QTextStream sub_tex_input_stream(&sub_tex_file);
-    QString sub_tex_content=sub_tex_input_stream.readAll();
-    sub_tex_file.close();
-
-    if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+this->files_list[this->current_index]+".tex"+tr(" for read"));
-        return;
-    }
-
-
-    QTextStream sub_tex_output_stream(&sub_tex_file);
-    QRegularExpression put_page_pattern("\\\\putpage{.*");
-    qDebug()<<"Sub tex content"<<sub_tex_content;
-    sub_tex_content.replace(put_page_pattern,"\\putpage{"+this->files_list[this->current_index]+"}");
-    qDebug()<<sub_tex_content;
-    sub_tex_output_stream<<sub_tex_content;
-
-    sub_tex_file.flush();
-    sub_tex_file.close();
-
+    this->file_sys_interface->fix_file(this->files_list[this->current_index]);
     generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
 }
 
@@ -328,4 +283,8 @@ void grader_editor::set_tex_error(QString error){
         this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
     }
     this->tex_errors_lock.unlock();
+}
+
+void grader_editor::display_error(QString error){
+    QMessageBox::critical(this,tr("Error"),error);
 }

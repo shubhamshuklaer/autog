@@ -54,6 +54,8 @@ private slots:
 
     void set_tex_error(QString error);
 
+public slots:
+    void display_error(QString);
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);
