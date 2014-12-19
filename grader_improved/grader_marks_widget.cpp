@@ -24,31 +24,34 @@
 #include "ui_grader_marks_widget.h"
 
 
-grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denominations) :
+grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denominations_list) :
     QWidget(parent),
     ui(new Ui::grader_marks_widget)
 {
+    int i;
+
     ui->setupUi(this);
-    this->ui->marks_text->setValidator(new QDoubleValidator(this));
+
+    this->setFocusPolicy(Qt::StrongFocus);
+    this->setFocusProxy(this->ui->marks_text);
     this->check_box_list=QList<QCheckBox *>();
-    int i=0;
-    foreach(QString mark,marks_denominations){
-        qDebug() <<"marks "<<mark;
-        if(mark.toFloat()!=0){
-            qDebug() <<mark.toFloat();
-            QCheckBox *temp_box=new QCheckBox();
-            temp_box->setText(mark);
-            this->ui->horizontal_layout->addWidget(temp_box);
-            this->check_box_list<<temp_box;
-            connect(temp_box,SIGNAL(stateChanged(int)),this,SLOT(marks_check_box_changed()));
+    this->ui->marks_text->setValidator(new QDoubleValidator(this));
+    i=0;
+
+    foreach( QString mark , marks_denominations_list ){
+        if( mark.toFloat() != 0 ){
+            QCheckBox *new_box=new QCheckBox();
+            new_box->setText(mark);
+            this->ui->horizontal_layout->addWidget(new_box);
+            this->check_box_list<<new_box;
+            connect(new_box,SIGNAL(stateChanged(int)),this,SLOT(check_box_state_changed()));
             if(i==0)
                 QWidget::setTabOrder(this->ui->marks_text,this->check_box_list[i]);
             else
                 QWidget::setTabOrder(this->check_box_list[i-1],this->check_box_list[i]);
         }
     }
-    this->setFocusPolicy(Qt::StrongFocus);
-    this->setFocusProxy(this->ui->marks_text);
+
     connect(this->ui->marks_text,SIGNAL(textChanged(QString)),this,SIGNAL(marks_changed()));
 }
 
@@ -65,13 +68,11 @@ void grader_marks_widget::put_marks(QString marks){
     this->ui->marks_text->setText(marks);
 }
 
-void grader_marks_widget::marks_check_box_changed(){
+void grader_marks_widget::check_box_state_changed(){
     float marks=0;
-    foreach(QCheckBox *check_box,this->check_box_list){
-        if(check_box->isChecked())
+    foreach( QCheckBox *check_box , this->check_box_list ){
+        if( check_box->isChecked() )
             marks+=check_box->text().toFloat();
     }
-    qDebug() <<marks;
-    qDebug() <<QString::number(marks);
     this->ui->marks_text->setText(QString::number(marks));
 }

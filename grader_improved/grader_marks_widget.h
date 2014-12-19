@@ -1,9 +1,9 @@
 #ifndef GRADER_MARKS_WIDGET_H
 #define GRADER_MARKS_WIDGET_H
 
-#include <QWidget>
-#include <QList>
 #include <QCheckBox>
+#include <QList>
+#include <QWidget>
 
 namespace Ui {
 class grader_marks_widget;
@@ -15,18 +15,20 @@ class grader_marks_widget : public QWidget
     Q_PROPERTY(QString marks READ get_marks WRITE put_marks);
 
 public:
-    explicit grader_marks_widget(QWidget *parent = 0,QStringList marks_denominations=QStringList());
+    explicit grader_marks_widget(QWidget *parent = 0,QStringList marks_denominations_list=QStringList());
     QString get_marks();
-    QList<QCheckBox *> check_box_list;
     void put_marks(QString marks);
     ~grader_marks_widget();
+
+signals:
+    void marks_changed();
+
 private slots:
-    void marks_check_box_changed();
+    void check_box_state_changed();
 
 private:
     Ui::grader_marks_widget *ui;
-signals:
-    void marks_changed();
+    QList<QCheckBox *> check_box_list;
 };
 
 #endif // GRADER_MARKS_WIDGET_H
