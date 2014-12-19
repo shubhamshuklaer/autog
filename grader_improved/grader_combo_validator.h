@@ -1,7 +1,8 @@
 #ifndef GRADER_COMBO_VALIDATOR_H
 #define GRADER_COMBO_VALIDATOR_H
-#include <QValidator>
+
 #include <QAbstractItemModel>
+#include <QValidator>
 
 class grader_combo_validator :public QValidator
 {
@@ -11,7 +12,7 @@ public:
     QValidator::State validate(QString &, int &) const;
     void fixup(QString &input) const;
 private:
-    QAbstractItemModel *item_model;
+    QAbstractItemModel *data_model;
 };
 
 #endif // GRADER_COMBO_VALIDATOR_H

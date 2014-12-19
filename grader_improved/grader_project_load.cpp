@@ -1,17 +1,35 @@
-#include "grader_project_load.h"
-#include "ui_grader_project_load.h"
+/*
+ *  Copyright (C) 2014 Shubham Shukla <shubham.shukla@iitg.ernet.in>
+ *  This file is part of Auto Grader.
+ *
+ *  Auto Grader is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Auto Grader is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Auto Grader.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <QCompleter>
+#include <QDebug>
+#include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QFile>
-#include <QTextStream>
-#include <QDebug>
-#include <QCompleter>
 #include <QProcess>
-#include <QFile>
-#include <QTextStream>
 #include <QRegularExpression>
+#include <QTextStream>
+
 #include "constants.h"
 #include "grader_combo_validator.h"
+#include "grader_project_load.h"
+#include "ui_grader_project_load.h"
+
 
 QString latex_compile_command;
 
@@ -93,6 +111,7 @@ bool grader_project_load::parse_project_config(QString project_location){
     while(!config_text.atEnd()){
         this->ui->select_module_combo->addItem(config_text.readLine());
     }
+    qDebug() <<"select module combo model"<<this->ui->select_module_combo->model();
     project_config_file.close();
     this->project_path=project_location;
     return true;
@@ -106,8 +125,8 @@ QString grader_project_load::get_project_path(){
     return this->project_path;
 }
 
-QStringList grader_project_load::get_filesList(){
-    return this->filesList;
+QStringList grader_project_load::get_files_list(){
+    return this->files_list;
 }
 
 QStringList grader_project_load::get_marks_denominations(){
@@ -205,7 +224,7 @@ bool grader_project_load::setup_module(){
         temp_line=in.readLine();
         if(temp_line!=NULL){
             temp_split=temp_line.split(id_marks_delimiter);
-            this->filesList<<temp_split[0];
+            this->files_list<<temp_split[0];
             this->marks_denominations<<temp_split[1];
         }
     }
@@ -213,7 +232,7 @@ bool grader_project_load::setup_module(){
     module_config_file.close();
 
 
-    if(this->filesList.length()==0){
+    if(this->files_list.length()==0){
         QMessageBox::warning(this,tr("Error"),tr("No id's in the module config file ")+this->project_path+"/"+this->module_name+"/"+module_config_file_name);
         return false;
     }
@@ -221,14 +240,14 @@ bool grader_project_load::setup_module(){
 
     QDir out_dir(out_dir_name);
 
-    for(int i=0;i<this->filesList.length();i++){
-        if(!out_dir.exists(out_dir_name+"/"+this->filesList[i]+".tex")){
-            if(!QFile::copy(sub_tex_path,out_dir_name+"/"+this->filesList[i]+".tex")){
+    for(int i=0;i<this->files_list.length();i++){
+        if(!out_dir.exists(out_dir_name+"/"+this->files_list[i]+".tex")){
+            if(!QFile::copy(sub_tex_path,out_dir_name+"/"+this->files_list[i]+".tex")){
                 //couldn't copy
                 QMessageBox::warning(
                             this,
                             tr("Error"),
-                            tr("couldn't copy file from ")+sub_tex_path+tr(" to ")+out_dir_name+"/"+this->filesList[i]+".tex");
+                            tr("couldn't copy file from ")+sub_tex_path+tr(" to ")+out_dir_name+"/"+this->files_list[i]+".tex");
                 return false;
             }
         }
@@ -254,8 +273,8 @@ bool grader_project_load::setup_module(){
 
     QStringList put_into_main_pdf;
     put_into_main_pdf<<"\\begin{document}";
-    for(int i=0;i<this->filesList.length();i++){
-        put_into_main_pdf<<"\\include{"+const_out_dir_name+"/"+this->filesList[i]+"}";
+    for(int i=0;i<this->files_list.length();i++){
+        put_into_main_pdf<<"\\include{"+const_out_dir_name+"/"+this->files_list[i]+"}";
     }
     put_into_main_pdf<< "\\end{document}";
 
@@ -290,11 +309,11 @@ bool grader_project_load::setup_module(){
     main_pdf_tex_file.flush();
     main_pdf_tex_file.close();
 
-    for(int i=0;i<this->filesList.length();i++){
-        QFile sub_tex_file(out_dir_name+"/"+this->filesList[i]+".tex");
+    for(int i=0;i<this->files_list.length();i++){
+        QFile sub_tex_file(out_dir_name+"/"+this->files_list[i]+".tex");
 
         if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
-            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->filesList[i]+".tex"+tr(" for read"));
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->files_list[i]+".tex"+tr(" for read"));
             return false;
         }
 
@@ -303,7 +322,7 @@ bool grader_project_load::setup_module(){
         sub_tex_file.close();
 
         if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->filesList[i]+".tex"+tr(" for read"));
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+out_dir_name+"/"+this->files_list[i]+".tex"+tr(" for read"));
             return false;
         }
 
@@ -311,7 +330,7 @@ bool grader_project_load::setup_module(){
         QTextStream sub_tex_output_stream(&sub_tex_file);
         QRegularExpression put_page_pattern("\\\\putpage{.*");
         qDebug()<<"Sub tex content"<<sub_tex_content;
-        sub_tex_content.replace(put_page_pattern,"\\putpage{"+this->filesList[i]+"}");
+        sub_tex_content.replace(put_page_pattern,"\\putpage{"+this->files_list[i]+"}");
         qDebug()<<sub_tex_content;
         sub_tex_output_stream<<sub_tex_content;
 

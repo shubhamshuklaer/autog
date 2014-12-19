@@ -1,58 +1,88 @@
-#include "grader_combo_validator.h"
-#include <QValidator>
+/*
+ *  Copyright (C) 2014 Shubham Shukla <shubham.shukla@iitg.ernet.in>
+ *  This file is part of Auto Grader.
+ *
+ *  Auto Grader is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Auto Grader is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Auto Grader.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <QAbstractListModel>
-#include <QModelIndex>
 #include <QDebug>
+#include <QModelIndex>
+#include <QValidator>
+
+#include "grader_combo_validator.h"
+
 
 grader_combo_validator::grader_combo_validator(QObject * parent,QAbstractItemModel *model):
     QValidator(parent)
 {
-    this->item_model=model;
+    this->data_model=model;
 }
 
-QValidator::State grader_combo_validator::validate(QString &input, int &pos) const{
-    QModelIndex index;
+QValidator::State grader_combo_validator::validate(QString &input_text, int &pos) const{
+    bool acceptable,intermediate;
+    int current_item_num,num_items;
+    QModelIndex item_index;
     QString item_text;
-    bool acceptable=false,done=false,intermediate=false;
-    int i=0;
-    int j=this->item_model->rowCount();
-    while(i<j&&!done){
-        index=this->item_model->index(i,0);
-        item_text=this->item_model->data(index).toString();
-        if(item_text==input){
+    QValidator::State return_state;
+
+    acceptable=false;
+    intermediate=false;
+    current_item_num=0;
+    num_items=this->data_model->rowCount();
+
+    while( current_item_num < num_items && !acceptable ){
+        item_index=this->data_model->index(current_item_num,0);
+        item_text=this->data_model->data(item_index).toString();
+        if( item_text == input_text )
             acceptable=true;
-            done=true;
-        }else{
-            item_text.truncate(input.length());
-            if(item_text.toLower()==input.toLower())
+        else{
+            item_text.truncate(input_text.length());
+            if( item_text.toLower() == input_text.toLower() )
                 intermediate=true;
         }
-        i++;
+        current_item_num++;
     }
-    QValidator::State return_state;
-    if(acceptable)
+
+    if( acceptable )
         return_state=QValidator::Acceptable;
-    else if(intermediate)
+    else if( intermediate )
         return_state=QValidator::Intermediate;
     else
         return_state=QValidator::Invalid;
     return return_state;
 }
 
-void grader_combo_validator::fixup(QString &input) const{
-    QModelIndex index;
+
+void grader_combo_validator::fixup(QString &input_text) const{
+    bool done;
+    int current_item_num,num_items;
+    QModelIndex item_index;
     QString item_text;
-    bool done=false;
-    int i=0;
-    int j=this->item_model->rowCount();
-    while(i<j&&!done){
-        index=this->item_model->index(i,0);
-        item_text=this->item_model->data(index).toString();
-        item_text.truncate(input.length());
-        if(item_text.toLower()==input.toLower()){
-            input=this->item_model->data(index).toString();
+
+    done=false;
+    current_item_num=0;
+    num_items=this->data_model->rowCount();
+
+    while( current_item_num<num_items && !done ){
+        item_index=this->data_model->index(current_item_num,0);
+        item_text=this->data_model->data(item_index).toString();
+        item_text.truncate(input_text.length());
+        if( item_text.toLower() == input_text.toLower() ){
+            input_text=this->data_model->data(item_index).toString();
             done=true;
         }
-        i++;
+        current_item_num++;
     }
 }

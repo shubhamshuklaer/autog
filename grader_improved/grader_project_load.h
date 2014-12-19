@@ -13,13 +13,13 @@ class grader_project_load : public QWidget
     Q_OBJECT
     Q_PROPERTY(QString module_name READ get_module_name);
     Q_PROPERTY(QString project_path READ get_project_path);
-    Q_PROPERTY(QStringList filesList READ get_filesList);
+    Q_PROPERTY(QStringList files_list READ get_files_list);
     Q_PROPERTY(QStringList marks_denominations READ get_marks_denominations);
 public:
     explicit grader_project_load(QWidget *parent = 0);
     QString get_module_name();
     QString get_project_path();
-    QStringList get_filesList();
+    QStringList get_files_list();
     QStringList get_marks_denominations();
     ~grader_project_load();
 signals:
@@ -32,7 +32,7 @@ private slots:
 private:
     Ui::grader_project_load *ui;
     QString module_name,project_path;
-    QStringList filesList,marks_denominations;
+    QStringList files_list,marks_denominations;
     bool parse_project_config(QString);
     bool setup_module();
     void load_settings();

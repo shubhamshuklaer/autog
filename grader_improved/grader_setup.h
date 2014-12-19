@@ -16,7 +16,7 @@
 //    explicit grader_setup(QWidget *parent = 0);
 //    QString burst_dir_name,top_tex_name,out_dir_name,sub_tex_name;
 //    QDir burst_dir;
-//    QStringList filesList;
+//    QStringList files_list;
 //    ~grader_setup();
 //signals:
 //    void done();

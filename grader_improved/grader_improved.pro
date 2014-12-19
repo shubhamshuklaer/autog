@@ -34,3 +34,6 @@ FORMS    += mainwindow.ui \
     grader_editor.ui \
     grader_marks_widget.ui \
     grader_project_load.ui
+
+OTHER_FILES += \
+    COPYING.txt

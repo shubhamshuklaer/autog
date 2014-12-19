@@ -1,8 +1,28 @@
-#include "grader_marks_widget.h"
-#include "ui_grader_marks_widget.h"
-#include <QWidget>
+/*
+ *  Copyright (C) 2014 Shubham Shukla <shubham.shukla@iitg.ernet.in>
+ *  This file is part of Auto Grader.
+ *
+ *  Auto Grader is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Auto Grader is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Auto Grader.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <QCheckBox>
 #include <QDebug>
+#include <QWidget>
+
+#include "grader_marks_widget.h"
+#include "ui_grader_marks_widget.h"
+
 
 grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denominations) :
     QWidget(parent),
