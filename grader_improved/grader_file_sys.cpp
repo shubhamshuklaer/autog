@@ -28,7 +28,6 @@
 #include "constants.h"
 #include "grader_file_sys.h"
 
-extern QString latex_compile_command;
 
 grader_file_sys::grader_file_sys(QObject *parent,QString main_tex_dir_name,QString out_dir_name,QString sub_tex_path) :
     QObject(parent)

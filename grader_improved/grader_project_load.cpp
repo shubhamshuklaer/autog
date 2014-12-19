@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QHash>
 #include <QMessageBox>
 #include <QProcess>
 #include <QRegularExpression>
@@ -30,8 +31,19 @@
 #include "grader_project_load.h"
 #include "ui_grader_project_load.h"
 
+QString project_config_name="autog.config";
+QString module_config_file_name="module.config";
+QString const_out_dir_name="texfiles";
+QString const_top_tex_name="preamble.tex";
+QString const_sub_tex_name="sub_file.tex";
+QChar id_marks_delimiter=';';
+QChar marks_denominations_delemiter='+';
+QChar settings_delemiter=':';
+QString const_main_pdf_name="main_pdf";
+QString const_bursts_dir_name="bursts";
+QString settings_config_name="settings.config";
+QString latex_compile_command="pdflatex -file-line-error -interaction=nonstopmode";
 
-QString latex_compile_command;
 
 grader_project_load::grader_project_load(QWidget *parent) :
     QWidget(parent),
@@ -135,35 +147,89 @@ QStringList grader_project_load::get_marks_denominations(){
 
 
 void grader_project_load::load_settings(){
+    QHash<QString,QString> settings_dict;
+    QHash<QString,QString>::iterator settings_iterator;
     latex_compile_command=QString();
     QDir project_dir(this->project_path);
     if(project_dir.exists(settings_config_name)){
-        QFile settings_config_file(this->project_path+"/"+this->module_name+"/"+settings_config_name);
+        QFile settings_config_file(this->project_path+"/"+settings_config_name);
         if(!settings_config_file.open(QIODevice::ReadOnly | QIODevice::Text)){
-            QMessageBox::warning(this,tr("Error"),tr("couldn't open settings config file ")+this->project_path+"/"+this->module_name+"/"+settings_config_name);
+            QMessageBox::warning(this,tr("Error"),tr("couldn't open settings config file ")+this->project_path+"/"+settings_config_name);
             return;
         }
 
         QTextStream in(&settings_config_file);
         QString temp_line;
         QStringList temp_split;
-        while(!in.atEnd()){
+        if(!in.atEnd()){
             temp_line=in.readLine();
+            if(temp_line.trimmed().length()==1){
+                settings_delemiter=temp_line.trimmed()[0];
+            }else{
+                in.reset();
+            }
+        }
+        while(!in.atEnd()){
+            temp_line=in.readLine().trimmed();
             if(temp_line!=NULL){
                 temp_split=temp_line.split(settings_delemiter);
-                if(temp_split[0]==latex_compile_command_setting_name&&temp_split[1]!=NULL){
-                    latex_compile_command=temp_split[1];
-                    qDebug() <<"latex compile set";
-                }
+                if(temp_split[1]!=NULL)
+                    settings_dict.insert(temp_split[0],temp_split[1]);
             }
         }
     }
 
-    if(latex_compile_command==NULL){
-        latex_compile_command=default_latex_compile_command;
-        qDebug()<<"Default set";
+    settings_iterator=settings_dict.find("project_config_name");
+    if(settings_iterator!=settings_dict.end()){
+        project_config_name=settings_iterator.value().trimmed();
     }
-    qDebug() <<latex_compile_command;
+
+    settings_iterator=settings_dict.find("module_config_file_name");
+    if(settings_iterator!=settings_dict.end()){
+        module_config_file_name=settings_iterator.value().trimmed();
+    }
+
+    settings_iterator=settings_dict.find("const_out_dir_name");
+    if(settings_iterator!=settings_dict.end()){
+        const_out_dir_name=settings_iterator.value().trimmed();
+    }
+
+    settings_iterator=settings_dict.find("const_top_tex_name");
+    if(settings_iterator!=settings_dict.end()){
+        const_top_tex_name=settings_iterator.value().trimmed();
+    }
+
+    settings_iterator=settings_dict.find("const_sub_tex_name");
+    if(settings_iterator!=settings_dict.end()){
+        const_sub_tex_name=settings_iterator.value().trimmed();
+    }
+
+    settings_iterator=settings_dict.find("id_marks_delimiter");
+    if(settings_iterator!=settings_dict.end()){
+        id_marks_delimiter=settings_iterator.value().trimmed()[0];
+    }
+
+    settings_iterator=settings_dict.find("marks_denominations_delemiter");
+    if(settings_iterator!=settings_dict.end()){
+        marks_denominations_delemiter=settings_iterator.value().trimmed()[0];
+    }
+
+
+    settings_iterator=settings_dict.find("const_main_pdf_name");
+    if(settings_iterator!=settings_dict.end()){
+        const_main_pdf_name=settings_iterator.value().trimmed();
+    }
+
+    settings_iterator=settings_dict.find("const_bursts_dir_name");
+    if(settings_iterator!=settings_dict.end()){
+        const_bursts_dir_name=settings_iterator.value().trimmed();
+    }
+
+
+    settings_iterator=settings_dict.find("latex_compile_command");
+    if(settings_iterator!=settings_dict.end()){
+        latex_compile_command=settings_iterator.value().trimmed();
+    }
 }
 
 
