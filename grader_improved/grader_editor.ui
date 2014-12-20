@@ -19,11 +19,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>1</x>
-     <y>1</y>
+     <x>0</x>
+     <y>0</y>
      <width>401</width>
      <height>181</height>
     </rect>
@@ -118,9 +118,6 @@
         <width>310</width>
         <height>35</height>
        </size>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::StrongFocus</enum>
       </property>
      </widget>
     </item>

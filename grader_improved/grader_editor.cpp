@@ -203,7 +203,15 @@ void grader_editor::setup_marks_widget(int index){
     this->marks_widget->setFixedSize(this->ui->marks_widget->size());
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
     this->ui->marks_label->setBuddy(this->marks_widget);
-    this->ui->marks_widget->setFocusProxy(this->marks_widget);
+    QWidget::setTabOrder( this->ui->file_name_combo, this->marks_widget );
+    QWidget::setTabOrder( this->marks_widget, this->ui->comment_pos_combo );
+    QWidget::setTabOrder( this->ui->comment_pos_combo, this->ui->comment_text );
+    QWidget::setTabOrder( this->ui->comment_text, this->ui->next_btn );
+    QWidget::setTabOrder( this->ui->next_btn, this->ui->prev_btn );
+    QWidget::setTabOrder( this->ui->prev_btn, this->ui->see_errors_btn );
+    QWidget::setTabOrder( this->ui->see_errors_btn, this->ui->open_tex_btn );
+    QWidget::setTabOrder( this->ui->open_tex_btn, this->ui->fix_file_btn );
+    QWidget::setTabOrder( this->ui->fix_file_btn, this->ui->preview_btn );
     this->marks_widget->show();
 }
 
