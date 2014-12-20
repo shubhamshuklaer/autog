@@ -166,7 +166,7 @@ void grader_project_load::load_settings(){
             if(temp_line.trimmed().length()==1){
                 settings_delemiter=temp_line.trimmed()[0];
             }else{
-                in.reset();
+                in.seek(0);
             }
         }
         while(!in.atEnd()){
@@ -174,62 +174,77 @@ void grader_project_load::load_settings(){
             if(temp_line!=NULL){
                 temp_split=temp_line.split(settings_delemiter);
                 if(temp_split[1]!=NULL)
-                    settings_dict.insert(temp_split[0],temp_split[1]);
+                    settings_dict.insert(temp_split[0].trimmed(),temp_split[1].trimmed());
             }
         }
     }
 
-    settings_iterator=settings_dict.find("project_config_name");
-    if(settings_iterator!=settings_dict.end()){
-        project_config_name=settings_iterator.value().trimmed();
-    }
+    QString settings;
+    settings+="Current settings are \n";
+    settings+="settings_delemiter is   \""+QString(settings_delemiter)+"\"\n";
+//    settings_iterator=settings_dict.find("project_config_name");
+//    if(settings_iterator!=settings_dict.end()){
+//        project_config_name=settings_iterator.value().trimmed();
+//    }
+//    settings+="project_config_name is   \""+project_config_name+"\"\n";
 
     settings_iterator=settings_dict.find("module_config_file_name");
     if(settings_iterator!=settings_dict.end()){
         module_config_file_name=settings_iterator.value().trimmed();
     }
+    settings+="\"module_config_file_name is   \""+module_config_file_name+"\"\n";
 
     settings_iterator=settings_dict.find("const_out_dir_name");
     if(settings_iterator!=settings_dict.end()){
         const_out_dir_name=settings_iterator.value().trimmed();
     }
+    settings+="\"const_out_dir_name is   \""+const_out_dir_name+"\"\n";
 
     settings_iterator=settings_dict.find("const_top_tex_name");
     if(settings_iterator!=settings_dict.end()){
         const_top_tex_name=settings_iterator.value().trimmed();
     }
+    settings+="\"const_top_tex_name is   \""+const_top_tex_name+"\"\n";
 
     settings_iterator=settings_dict.find("const_sub_tex_name");
     if(settings_iterator!=settings_dict.end()){
         const_sub_tex_name=settings_iterator.value().trimmed();
     }
+    settings+="\"const_sub_tex_name is   \""+const_sub_tex_name+"\"\n";
 
     settings_iterator=settings_dict.find("id_marks_delimiter");
     if(settings_iterator!=settings_dict.end()){
         id_marks_delimiter=settings_iterator.value().trimmed()[0];
     }
+    settings+="\"id_marks_delimiter is   \""+QString(id_marks_delimiter)+"\"\n";
 
     settings_iterator=settings_dict.find("marks_denominations_delemiter");
     if(settings_iterator!=settings_dict.end()){
         marks_denominations_delemiter=settings_iterator.value().trimmed()[0];
     }
+    settings+="\"marks_denominations_delemiter is   \""+QString(marks_denominations_delemiter)+"\"\n";
 
 
     settings_iterator=settings_dict.find("const_main_pdf_name");
     if(settings_iterator!=settings_dict.end()){
         const_main_pdf_name=settings_iterator.value().trimmed();
     }
+    settings+="\"const_main_pdf_name is   \""+const_main_pdf_name+"\"\n";
 
     settings_iterator=settings_dict.find("const_bursts_dir_name");
     if(settings_iterator!=settings_dict.end()){
         const_bursts_dir_name=settings_iterator.value().trimmed();
     }
+    settings+="\"const_bursts_dir_name is   \""+const_bursts_dir_name+"\"\n";
 
 
     settings_iterator=settings_dict.find("latex_compile_command");
     if(settings_iterator!=settings_dict.end()){
         latex_compile_command=settings_iterator.value().trimmed();
     }
+    settings+="\"latex_compile_command is   \""+latex_compile_command+"\"\n";
+
+    QMessageBox::information(this,tr("Current settings"),settings);
 }
 
 
