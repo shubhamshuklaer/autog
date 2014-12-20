@@ -12,7 +12,7 @@ class grader_marks_widget;
 class grader_marks_widget : public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QString marks READ get_marks WRITE put_marks);
+    Q_PROPERTY(QString marks READ get_marks WRITE put_marks)
 
 public:
     explicit grader_marks_widget(QWidget *parent = 0,QStringList marks_denominations_list=QStringList());

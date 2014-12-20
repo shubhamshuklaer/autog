@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "grader_editor.h"
 #include "grader_project_load.h"
-#include "grader_setup.h"
 
 namespace Ui {
 class MainWindow;

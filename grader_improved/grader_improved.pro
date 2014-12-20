@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     grader_combo_validator.cpp
 
 HEADERS  += mainwindow.h \
-    grader_setup.h \
     grader_editor.h \
     grader_marks_widget.h \
     grader_project_load.h \

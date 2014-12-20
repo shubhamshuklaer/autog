@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>184</height>
+    <width>403</width>
+    <height>183</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,11 +19,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>2</x>
-     <y>2</y>
+     <x>1</x>
+     <y>1</y>
      <width>401</width>
      <height>181</height>
     </rect>
@@ -120,7 +120,7 @@
        </size>
       </property>
       <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
+       <enum>Qt::StrongFocus</enum>
       </property>
      </widget>
     </item>
@@ -289,6 +289,7 @@
  </widget>
  <tabstops>
   <tabstop>file_name_combo</tabstop>
+  <tabstop>marks_widget</tabstop>
   <tabstop>comment_pos_combo</tabstop>
   <tabstop>comment_text</tabstop>
   <tabstop>next_btn</tabstop>
@@ -296,6 +297,7 @@
   <tabstop>fix_file_btn</tabstop>
   <tabstop>preview_btn</tabstop>
   <tabstop>see_errors_btn</tabstop>
+  <tabstop>open_tex_btn</tabstop>
  </tabstops>
  <resources/>
  <connections/>

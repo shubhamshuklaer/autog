@@ -203,6 +203,7 @@ void grader_editor::setup_marks_widget(int index){
     this->marks_widget->setFixedSize(this->ui->marks_widget->size());
     connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
     this->ui->marks_label->setBuddy(this->marks_widget);
+    this->ui->marks_widget->setFocusProxy(this->marks_widget);
     this->marks_widget->show();
 }
 
