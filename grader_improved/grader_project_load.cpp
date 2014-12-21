@@ -84,7 +84,7 @@ void grader_project_load::select_project_btn_clicked(){
                                                  | QFileDialog::DontResolveSymlinks);
 
     if( dir_path != NULL ){
-        this->ui->project_dir_name->setText(dir_path);
+        this->ui->project_dir_path->setText(dir_path);
 
         selected_dir=QDir(dir_path);
         if( selected_dir.exists( project_config_file_name ) ){
@@ -161,8 +161,8 @@ QStringList grader_project_load::get_files_list(){
 }
 
 
-QStringList grader_project_load::get_marks_denominations(){
-    return this->marks_denominations;
+QStringList grader_project_load::get_marks_denominations_list(){
+    return this->marks_denominations_list;
 }
 
 
@@ -322,7 +322,7 @@ bool grader_project_load::setup_module(){
         if( temp_line != NULL ){
             temp_split=temp_line.split( id_marks_delimiter );
             this->files_list<<temp_split[0];
-            this->marks_denominations<<temp_split[1];
+            this->marks_denominations_list<<temp_split[1];
         }
     }
 

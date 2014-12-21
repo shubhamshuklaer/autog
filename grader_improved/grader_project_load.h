@@ -12,7 +12,7 @@ class grader_project_load : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QStringList files_list READ get_files_list)
-    Q_PROPERTY(QStringList marks_denominations READ get_marks_denominations)
+    Q_PROPERTY(QStringList marks_denominations_list READ get_marks_denominations_list)
     Q_PROPERTY(QString module_name READ get_module_name)
     Q_PROPERTY(QString project_path READ get_project_path)
 
@@ -21,7 +21,7 @@ public:
     QString get_module_name();
     QString get_project_path();
     QStringList get_files_list();
-    QStringList get_marks_denominations();
+    QStringList get_marks_denominations_list();
     ~grader_project_load();
 
 signals:
@@ -34,7 +34,7 @@ private slots:
 private:
     Ui::grader_project_load *ui;
     QString module_name,project_path;
-    QStringList files_list,marks_denominations;
+    QStringList files_list,marks_denominations_list;
 
     bool configure_project(QString);
     bool setup_module();

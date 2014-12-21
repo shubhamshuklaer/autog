@@ -28,7 +28,7 @@ private slots:
 
 private:
     Ui::grader_marks_widget *ui;
-    QList<QCheckBox *> check_box_list;
+    QList<QCheckBox *> marks_check_boxes_list;
 };
 
 #endif // GRADER_MARKS_WIDGET_H

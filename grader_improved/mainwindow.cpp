@@ -44,7 +44,7 @@ void MainWindow::setup_done(){
     this->module_name=this->project_load_widget->property("module_name").toString();
     this->files_list=this->project_load_widget->property("files_list").toStringList();
     this->marks_denominations_list=this->project_load_widget->property(
-                "marks_denominations").toStringList();
+                "marks_denominations_list").toStringList();
     delete this->project_load_widget;
     this->setWindowTitle(this->module_name);
     this->editor_widget=new grader_editor(this,this->project_path,this->module_name,

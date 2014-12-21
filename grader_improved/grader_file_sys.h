@@ -8,7 +8,7 @@ class grader_file_sys : public QObject
 {
     Q_OBJECT
 public:
-    explicit grader_file_sys(QObject *parent = 0,QString main_tex_dir_name=QString(),QString out_dir_name=QString(),QString sub_tex_path=QString());
+    explicit grader_file_sys(QObject *parent = 0,QString main_tex_dir_path=QString(),QString out_dir_path=QString(),QString sub_tex_path=QString());
     QString get_marks(QString file_name);
     QString get_comment(QString file_name,QString comment_pos);
     void fix_file(QString file_name);
@@ -25,10 +25,9 @@ signals:
 public slots:
 
 private:
-    QMutex file_mutex,tex_mutex,main_file_mutex;
+    QMutex sub_tex_files_edit_lock,tex_compile_lock,main_tex_edit_lock;
     bool include_only(bool is_include_only,QString file_name);
-    QString escape_string(QString comment);
-    QString main_tex_dir_name,out_dir_name,sub_tex_path;
+    QString main_tex_dir_path,out_dir_path,sub_tex_path;
 };
 
 #endif // GRADER_FILE_SYS_H

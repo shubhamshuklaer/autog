@@ -34,7 +34,7 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
 
     this->setFocusPolicy(Qt::StrongFocus);
     this->setFocusProxy(this->ui->marks_text);
-    this->check_box_list=QList<QCheckBox *>();
+    this->marks_check_boxes_list=QList<QCheckBox *>();
     this->ui->marks_text->setValidator(new QDoubleValidator(this));
     i=0;
 
@@ -43,12 +43,12 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
             QCheckBox *new_box=new QCheckBox();
             new_box->setText(mark);
             this->ui->horizontal_layout->addWidget(new_box);
-            this->check_box_list<<new_box;
+            this->marks_check_boxes_list<<new_box;
             connect(new_box,SIGNAL(stateChanged(int)),this,SLOT(check_box_state_changed()));
             if(i==0)
-                QWidget::setTabOrder(this->ui->marks_text,this->check_box_list[i]);
+                QWidget::setTabOrder(this->ui->marks_text,this->marks_check_boxes_list[i]);
             else
-                QWidget::setTabOrder(this->check_box_list[i-1],this->check_box_list[i]);
+                QWidget::setTabOrder(this->marks_check_boxes_list[i-1],this->marks_check_boxes_list[i]);
         }
     }
 
@@ -70,7 +70,7 @@ void grader_marks_widget::put_marks(QString marks){
 
 void grader_marks_widget::check_box_state_changed(){
     float marks=0;
-    foreach( QCheckBox *check_box , this->check_box_list ){
+    foreach( QCheckBox *check_box , this->marks_check_boxes_list ){
         if( check_box->isChecked() )
             marks+=check_box->text().toFloat();
     }
