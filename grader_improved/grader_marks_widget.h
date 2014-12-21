@@ -25,6 +25,7 @@ signals:
 
 private slots:
     void check_box_state_changed();
+    void marks_edited();
 
 private:
     Ui::grader_marks_widget *ui;

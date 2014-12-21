@@ -24,7 +24,8 @@
 #include "ui_grader_marks_widget.h"
 
 
-grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denominations_list) :
+grader_marks_widget::grader_marks_widget( QWidget *parent,
+                                       QStringList marks_denominations_list ) :
     QWidget(parent),
     ui(new Ui::grader_marks_widget)
 {
@@ -44,15 +45,22 @@ grader_marks_widget::grader_marks_widget(QWidget *parent,QStringList marks_denom
             new_box->setText(mark);
             this->ui->horizontal_layout->addWidget(new_box);
             this->marks_check_boxes_list<<new_box;
-            connect(new_box,SIGNAL(stateChanged(int)),this,SLOT(check_box_state_changed()));
+
+            // I am using clicked signal from QABstractButton as statechanged is
+            //aslo emited when state is changed programitically
+
+            connect(new_box,SIGNAL( clicked(bool)), this,
+                                             SLOT( check_box_state_changed() ) );
             if(i==0)
-                QWidget::setTabOrder(this->ui->marks_text,this->marks_check_boxes_list[i]);
+                QWidget::setTabOrder( this->ui->marks_text,
+                                            this->marks_check_boxes_list[i] );
             else
-                QWidget::setTabOrder(this->marks_check_boxes_list[i-1],this->marks_check_boxes_list[i]);
+                QWidget::setTabOrder( this->marks_check_boxes_list[i-1],
+                                                this->marks_check_boxes_list[i] );
         }
     }
 
-    connect(this->ui->marks_text,SIGNAL(textChanged(QString)),this,SIGNAL(marks_changed()));
+    connect( this->ui->marks_text, SIGNAL( textEdited( QString ) ), this, SLOT( marks_edited() ) );
 }
 
 grader_marks_widget::~grader_marks_widget()
@@ -61,11 +69,55 @@ grader_marks_widget::~grader_marks_widget()
 }
 
 QString grader_marks_widget::get_marks(){
-    return this->ui->marks_text->text();
+    QString marks;
+    float marks_value=0;
+    foreach( QCheckBox *check_box , this->marks_check_boxes_list ){
+        if( check_box->isChecked() ){
+            marks+=check_box->text()+"+";
+            marks_value+=check_box->text().toFloat();
+        }else{
+            marks+="0+";
+        }
+    }
+    if( QString::number( marks_value ) == this->ui->marks_text->text().trimmed() ){
+        marks.truncate( marks.size()-1 );   //removing the last +
+    }else{
+        marks=this->ui->marks_text->text();
+    }
+
+    return marks;
 }
 
 void grader_marks_widget::put_marks(QString marks){
-    this->ui->marks_text->setText(marks);
+    QStringList marks_denominations=marks.split( "+", QString::SkipEmptyParts );
+    float marks_value=0;
+    int i=0,j=0;
+
+    bool wrong_format=false;
+    if( marks_denominations.size() != this->marks_check_boxes_list.size() )
+        wrong_format=true;
+
+    while( i < marks_denominations.size() ){
+        marks_value+=marks_denominations[i].toFloat();
+        if( !wrong_format ){
+            if( marks_denominations[i].trimmed() == "0" ){
+                this->marks_check_boxes_list[i]->setChecked(false);
+            }else if( marks_denominations[i].trimmed() == this->marks_check_boxes_list[i]->text() ){
+                this->marks_check_boxes_list[i]->setChecked(true);
+            }else{
+                wrong_format=true;
+            }
+        }
+        i++;
+    }
+
+    //Resetting marks checkboxes if the format is wrong
+    if( wrong_format ){
+        foreach( QCheckBox *check_box , this->marks_check_boxes_list )
+            check_box->setChecked(false);
+    }
+
+    this->ui->marks_text->setText(QString::number(marks_value));
 }
 
 void grader_marks_widget::check_box_state_changed(){
@@ -75,4 +127,11 @@ void grader_marks_widget::check_box_state_changed(){
             marks+=check_box->text().toFloat();
     }
     this->ui->marks_text->setText(QString::number(marks));
+    emit marks_changed();
+}
+
+void grader_marks_widget::marks_edited(){
+    foreach( QCheckBox *check_box, this->marks_check_boxes_list )
+        check_box->setChecked( false );
+    emit marks_changed();
 }

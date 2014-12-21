@@ -27,7 +27,6 @@ public:
     grader_file_sys *file_sys_interface;
     QThread *file_sys_thread;
     QMutex tex_compile_errors_lock;
-    void put_marks(bool async,QString file_name , QString marks);
     void put_comment(bool async,QString file_name , QString comment,QString comment_pos);
     void generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos);
 

@@ -245,20 +245,6 @@ void grader_editor::on_comment_pos_combo_activated(int index)
 
 
 
-
-void grader_editor::put_marks(bool async,QString file_name , QString marks){
-    if(async){
-        QByteArray normalizedSignature = QMetaObject::normalizedSignature("put_comment(QString, QString)");
-        int method_index=this->file_sys_interface->metaObject()->indexOfMethod(normalizedSignature);
-        QMetaMethod method=this->file_sys_interface->metaObject()->method(method_index);
-        method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString,file_name),Q_ARG(QString,marks));
-    }else{
-        this->file_sys_interface->put_marks(file_name,marks);
-    }
-}
-
-
-
 void grader_editor::put_comment(bool async,QString file_name , QString comment,QString comment_pos){
     if(async){
         QByteArray normalizedSignature = QMetaObject::normalizedSignature("put_comment(QString, QString)");
