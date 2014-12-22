@@ -37,7 +37,9 @@
 #include "ui_grader_editor.h"
 
 
-grader_editor::grader_editor(QWidget *parent,QString project_path,QString module_name,QStringList files_list,QStringList marks_denominations_list) :
+grader_editor::grader_editor( QWidget *parent, QString project_path,
+                              QString module_name, QStringList files_list,
+                                        QStringList marks_denominations_list ) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
@@ -58,16 +60,24 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     this->marks_widget=NULL;
 
     this->file_sys_thread= new QThread(this);
-    this->file_sys_interface=new grader_file_sys(NULL,this->main_tex_dir_path,this->out_dir_path,this->sub_tex_path);
+    //I have set the parent as null cause we can't move a object
+    //with parent to a different thread
+    this->file_sys_interface=new grader_file_sys(NULL,
+                                                this->main_tex_dir_path,
+                                                    this->out_dir_path,
+                                                        this->sub_tex_path );
     //QObject::moveToThread: Cannot move objects with a parent
     this->file_sys_interface->moveToThread(this->file_sys_thread);
-    connect(this->file_sys_interface,SIGNAL(send_tex_error(QString)),this,SLOT(set_tex_compile_error(QString)));
-    connect(this->file_sys_interface,SIGNAL(send_error(QString)),this,SLOT(display_error(QString)));
+    connect( this->file_sys_interface, SIGNAL( send_tex_error( QString ) ),
+                                this, SLOT( set_tex_compile_error( QString ) ) );
+    connect( this->file_sys_interface, SIGNAL( send_error( QString ) ),
+                                  this, SLOT( display_errors_slot( QString ) ) );
     this->file_sys_thread->start();
 
     setup_marks_widget(0);
 
-    this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->files_list[0],"t"));
+    this->ui->comment_text->setText(this->file_sys_interface->get_comment(
+                                                    this->files_list[0], "t" ) );
     if(this->current_index+1>=this->files_list.length())
         this->ui->next_btn->setEnabled(false);
     this->ui->prev_btn->setEnabled(false);
@@ -78,7 +88,9 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->file_name_combo->model());
     this->ui->file_name_combo->setCompleter(completer);
-    this->ui->file_name_combo->setValidator(new grader_combo_validator(this->ui->file_name_combo,this->ui->file_name_combo->model()));
+    this->ui->file_name_combo->setValidator(
+                new grader_combo_validator( this->ui->file_name_combo,
+                                          this->ui->file_name_combo->model() ) );
 
 
     completer=new QCompleter(this->ui->comment_pos_combo);
@@ -86,7 +98,9 @@ grader_editor::grader_editor(QWidget *parent,QString project_path,QString module
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->comment_pos_combo->model());
     this->ui->comment_pos_combo->setCompleter(completer);
-    this->ui->comment_pos_combo->setValidator(new grader_combo_validator(this->ui->comment_pos_combo,this->ui->comment_pos_combo->model()));
+    this->ui->comment_pos_combo->setValidator(
+                new grader_combo_validator( this->ui->comment_pos_combo,
+                                        this->ui->comment_pos_combo->model() ) );
 
 }
 
@@ -99,12 +113,14 @@ grader_editor::~grader_editor()
 
 void grader_editor::on_next_btn_clicked()
 {
-    generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
+
     if(this->tex_compile_errors!=NULL){
-        QMessageBox::warning(
-                    this,
-                    tr("Grader"),
-                    tr("Please fix all errors before proceding"));
+        display_error( tr( "Please fix all errors before proceding" ) );
     }else{
         if(this->current_index+2==this->files_list.length())
             this->ui->next_btn->setEnabled(false);
@@ -114,18 +130,23 @@ void grader_editor::on_next_btn_clicked()
         setup_marks_widget(this->current_index);
         this->ui->comment_pos_combo->setCurrentIndex(0);
         this->previous_comment_pos_index=0;
-        this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->files_list[this->current_index],"t"));
+        this->ui->comment_text->setText(this->file_sys_interface->
+                                  get_comment(
+                                      this->files_list[this->current_index],
+                                                                        "t") );
     }
 }
 
 void grader_editor::on_prev_btn_clicked()
 {
-    generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    if(this->tex_compile_errors!=NULL){
-        QMessageBox::warning(
-                    this,
-                    tr("Grader"),
-                    tr("Please fix all errors before proceding"));
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
+
+    if( this->tex_compile_errors != NULL ){
+        display_error( tr( "Please fix all errors before proceding" ) );
     }else{
         if(this->current_index<=1)
             this->ui->prev_btn->setEnabled(false);
@@ -135,15 +156,28 @@ void grader_editor::on_prev_btn_clicked()
         setup_marks_widget(this->current_index);
         this->ui->comment_pos_combo->setCurrentIndex(0);
         this->previous_comment_pos_index=0;
-        this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->files_list[this->current_index],"t"));
+        this->ui->comment_text->setText(this->file_sys_interface->
+                                  get_comment(
+                                      this->files_list[this->current_index],
+                                                                        "t") );
     }
 }
 
 void grader_editor::on_preview_btn_clicked()
 {
-    generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
-    if(!QDesktopServices::openUrl(QUrl("file:///"+this->main_tex_dir_path+"/"+const_main_pdf_name+".pdf", QUrl::TolerantMode))){
-        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->main_tex_dir_path+"/"+const_main_pdf_name+".pdf");
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
+
+
+    if( ! QDesktopServices::openUrl( QUrl( "file:///" + this->main_tex_dir_path +
+                                       "/" + const_main_pdf_name + ".pdf",
+                                                        QUrl::TolerantMode ) ) ){
+
+        display_error( tr( "couldn't open file " ) + this->main_tex_dir_path +
+                                            "/" + const_main_pdf_name + ".pdf" );
     }
 }
 
@@ -151,15 +185,20 @@ void grader_editor::on_preview_btn_clicked()
 void grader_editor::on_file_name_combo_activated(int index)
 {
     if(index!=this->current_index){
-        generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+
+        generate_pdf( true, this->files_list[this->current_index],
+                this->marks_widget->property( "marks" ).toString(),
+                            this->ui->comment_text->toPlainText(),
+                                this->ui->comment_pos_combo->itemText(
+                                    this->ui->comment_pos_combo->currentIndex() ) );
+
+        //Will only allow him to go ahed if this page is free of errors
         if(this->tex_compile_errors!=NULL){
             this->ui->file_name_combo->setCurrentIndex(this->current_index);
-            QMessageBox::warning(
-                        this,
-                        tr("Grader"),
-                        tr("Please fix all errors before proceding"));
+            display_error( tr( "Please fix all errors before proceding" ) );
         }else{
             this->current_index=index;
+
             if(this->current_index==0)
                 this->ui->prev_btn->setEnabled(false);
             else
@@ -168,10 +207,14 @@ void grader_editor::on_file_name_combo_activated(int index)
                 this->ui->next_btn->setEnabled(false);
             else
                 this->ui->next_btn->setEnabled(true);
+
             setup_marks_widget(this->current_index);
+
             this->ui->comment_pos_combo->setCurrentIndex(0);
             this->previous_comment_pos_index=0;
-            this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->files_list[this->current_index],"t"));
+
+            this->ui->comment_text->setText( this->file_sys_interface->get_comment(
+                                       this->files_list[this->current_index], "t" ) );
         }
     }
 }
@@ -179,20 +222,21 @@ void grader_editor::on_file_name_combo_activated(int index)
 
 void grader_editor::on_fix_file_btn_clicked()
 {
-    this->file_sys_interface->fix_file(this->files_list[this->current_index]);
-    generate_pdf(false,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    //overwrite file by default version
+    this->file_sys_interface->fix_file( this->files_list[this->current_index] );
+
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
 }
 
 
 
 void grader_editor::on_see_errors_btn_clicked()
 {
-    QString temp_tex_errors;
-    temp_tex_errors=this->tex_compile_errors;
-    QMessageBox::warning(
-                this,
-                tr("Grader"),
-                temp_tex_errors );
+    display_error( this->tex_compile_errors );
 }
 
 
@@ -200,11 +244,18 @@ void grader_editor::on_see_errors_btn_clicked()
 void grader_editor::setup_marks_widget(int index){
     if(this->marks_widget!=NULL)
         delete this->marks_widget;
-    this->marks_widget=new grader_marks_widget(this->ui->marks_widget,this->marks_denominations_list[index].split(marks_denominations_delemiter));
-    this->marks_widget->setProperty("marks",this->file_sys_interface->get_marks(this->files_list[index]));
+
+    this->marks_widget=new grader_marks_widget( this->ui->marks_widget,
+                                        this->marks_denominations_list[index].split(
+                                                    marks_denominations_delemiter ) );
+    this->marks_widget->setProperty("marks",this->file_sys_interface->get_marks(
+                                                          this->files_list[index] ) );
     this->marks_widget->setFixedSize(this->ui->marks_widget->size());
-    connect(this->marks_widget,SIGNAL(marks_changed()),this,SLOT(on_marks_text_textChanged()));
+    connect( this->marks_widget, SIGNAL( marks_changed() ), this, SLOT(
+                                                      on_marks_text_textChanged() ) );
     this->ui->marks_label->setBuddy(this->marks_widget);
+
+    //setting tab order of editor widget
     QWidget::setTabOrder( this->ui->file_name_combo, this->marks_widget );
     QWidget::setTabOrder( this->marks_widget, this->ui->comment_pos_combo );
     QWidget::setTabOrder( this->ui->comment_pos_combo, this->ui->comment_text );
@@ -214,6 +265,8 @@ void grader_editor::setup_marks_widget(int index){
     QWidget::setTabOrder( this->ui->see_errors_btn, this->ui->open_tex_btn );
     QWidget::setTabOrder( this->ui->open_tex_btn, this->ui->fix_file_btn );
     QWidget::setTabOrder( this->ui->fix_file_btn, this->ui->preview_btn );
+
+
     this->marks_widget->show();
 }
 
@@ -221,57 +274,99 @@ void grader_editor::setup_marks_widget(int index){
 
 void grader_editor::on_open_tex_btn_clicked()
 {
-    if(!QDesktopServices::openUrl(QUrl("file:///"+this->out_dir_path+"/"+this->files_list[this->current_index]+".tex", QUrl::TolerantMode))){
-        QMessageBox::warning(this,tr("Error"),tr("couldn't open file ")+this->out_dir_path+"/"+this->files_list[this->current_index]+".tex");
+    if( ! QDesktopServices::openUrl( QUrl( "file:///" +
+                                  this->out_dir_path + "/" +
+                                       this->files_list[this->current_index] +
+                                                ".tex", QUrl::TolerantMode ) ) ){
+
+        display_error( tr( "couldn't open file " ) + this->out_dir_path +
+                            "/" + this->files_list[this->current_index] + ".tex" );
+
     }
 }
 
 void grader_editor::on_marks_text_textChanged(){
-    generate_pdf(true,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
 }
 
 
 void grader_editor::on_comment_text_textChanged()
 {
-    generate_pdf(true,this->files_list[this->current_index],this->marks_widget->property("marks").toString(),this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->ui->comment_pos_combo->currentIndex()));
+    generate_pdf( true, this->files_list[this->current_index],
+            this->marks_widget->property( "marks" ).toString(),
+                        this->ui->comment_text->toPlainText(),
+                            this->ui->comment_pos_combo->itemText(
+                                this->ui->comment_pos_combo->currentIndex() ) );
 }
 
 void grader_editor::on_comment_pos_combo_activated(int index)
 {
-    put_comment(false,this->files_list[this->current_index],this->ui->comment_text->toPlainText(),this->ui->comment_pos_combo->itemText(this->previous_comment_pos_index));
+    put_comment( false, this->files_list[this->current_index],
+                    this->ui->comment_text->toPlainText(),
+                                this->ui->comment_pos_combo->itemText(
+                                            this->previous_comment_pos_index ) );
+
     this->previous_comment_pos_index=index;
-    this->ui->comment_text->setText(this->file_sys_interface->get_comment(this->files_list[this->current_index],this->ui->comment_pos_combo->itemText(index)));
+    this->ui->comment_text->setText(this->file_sys_interface->get_comment(
+                                        this->files_list[this->current_index],
+                                this->ui->comment_pos_combo->itemText( index ) ) );
 }
 
 
 
-void grader_editor::put_comment(bool async,QString file_name , QString comment,QString comment_pos){
+void grader_editor::put_comment( bool async, QString file_name ,
+                                        QString comment , QString comment_pos ){
     if(async){
-        QByteArray normalizedSignature = QMetaObject::normalizedSignature("put_comment(QString, QString)");
-        int method_index=this->file_sys_interface->metaObject()->indexOfMethod(normalizedSignature);
-        QMetaMethod method=this->file_sys_interface->metaObject()->method(method_index);
-        method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString, file_name),Q_ARG(QString, comment),Q_ARG(QString, comment_pos));
+        //Asynchronous function call
+        //the call is posted as a event the the file sys interface thread
+        QByteArray normalizedSignature = QMetaObject::normalizedSignature(
+                                                "put_comment( QString, QString )" );
+        int method_index=this->file_sys_interface->metaObject()->
+                                                  indexOfMethod(normalizedSignature);
+        QMetaMethod method=this->file_sys_interface->metaObject()->
+                                                                method(method_index);
+        method.invoke( this->file_sys_interface, Qt::QueuedConnection,
+                            Q_ARG( QString, file_name ), Q_ARG( QString, comment ),
+                                                     Q_ARG( QString, comment_pos ) );
     }else{
         this->file_sys_interface->put_comment(file_name,comment,comment_pos);
     }
 }
 
 
-void grader_editor::generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos){
+void grader_editor::generate_pdf(bool async, QString file_name, QString marks,
+                                        QString comment_text, QString comment_pos ){
     if(async){
-        QByteArray normalizedSignature = QMetaObject::normalizedSignature("generate_pdf(QString, QString,QString,QString)");
-        int method_index=this->file_sys_interface->metaObject()->indexOfMethod(normalizedSignature);
-        QMetaMethod method=this->file_sys_interface->metaObject()->method(method_index);
+        //Asynchronous function call
+        //the call is posted as a event the the file sys interface thread
+        QByteArray normalizedSignature = QMetaObject::normalizedSignature(
+                            "generate_pdf( QString, QString, QString, QString )" );
+        int method_index=this->file_sys_interface->metaObject()->indexOfMethod(
+                                                                normalizedSignature);
+        QMetaMethod method=this->file_sys_interface->metaObject()->method(
+                                                                      method_index);
         QCoreApplication::removePostedEvents(this->file_sys_interface);
-        method.invoke(this->file_sys_interface,Qt::QueuedConnection,Q_ARG(QString,file_name),Q_ARG(QString,marks),Q_ARG(QString,comment_text),Q_ARG(QString,comment_pos));
+        method.invoke(this->file_sys_interface, Qt::QueuedConnection,
+                            Q_ARG( QString, file_name ), Q_ARG( QString, marks ),
+                                        Q_ARG( QString, comment_text ),
+                                                  Q_ARG( QString, comment_pos ) );
     }else{
-        this->file_sys_interface->generate_pdf(file_name,marks,comment_text,comment_pos);
+        this->file_sys_interface->generate_pdf( file_name, marks, comment_text,
+                                                                    comment_pos );
     }
 }
 
 void grader_editor::set_tex_compile_error(QString error){
     this->tex_compile_errors_lock.lock();
+
     this->tex_compile_errors=error;
+
+    //Setting button stylesheet depending on
+    //if error is not empty
     if(this->tex_compile_errors!=""){
         this->ui->see_errors_btn->setEnabled(true);
         this->ui->see_errors_btn->setStyleSheet("QPushButton{color: red;}");
@@ -279,9 +374,16 @@ void grader_editor::set_tex_compile_error(QString error){
         this->ui->see_errors_btn->setEnabled(false);
         this->ui->see_errors_btn->setStyleSheet("QPushButton{}");
     }
+
     this->tex_compile_errors_lock.unlock();
 }
 
-void grader_editor::display_error(QString error){
-    QMessageBox::critical(this,tr("Error"),error);
+
+void grader_editor::display_errors_slot(QString error){
+    display_error(error);
+}
+
+
+void grader_editor::display_error( QString error ){
+    QMessageBox::critical( this, tr( "Error" ), error );
 }

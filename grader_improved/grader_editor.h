@@ -54,10 +54,11 @@ private slots:
     void set_tex_compile_error(QString error);
 
 public slots:
-    void display_error(QString);
+    void display_errors_slot(QString);
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);
+    void display_error(QString);
 
 
 
