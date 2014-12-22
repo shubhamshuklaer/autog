@@ -30,7 +30,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="project_dir_name">
+      <widget class="QLineEdit" name="project_dir_path">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>

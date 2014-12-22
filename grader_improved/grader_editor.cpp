@@ -35,6 +35,7 @@
 #include "grader_editor.h"
 #include "grader_marks_widget.h"
 #include "ui_grader_editor.h"
+#include "lightlatexhighlighter.h"
 
 
 grader_editor::grader_editor( QWidget *parent, QString project_path,
@@ -101,6 +102,8 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->ui->comment_pos_combo->setValidator(
                 new grader_combo_validator( this->ui->comment_pos_combo,
                                         this->ui->comment_pos_combo->model() ) );
+
+    LightLatexHighlighter *highlighter=new LightLatexHighlighter(this->ui->comment_text->document());
 
 }
 
