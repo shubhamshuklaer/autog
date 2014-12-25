@@ -19,7 +19,8 @@ LightLatexHighlighter::LightLatexHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     isGraphic=false;
-    ColorStandard = QColor("#4714E0");
+//    ColorStandard = QColor("#4714E0");
+    ColorStandard = QColor("#000000");
     //ColorStandard = QColor("#FFFFFF");
     ColorComment = QColor("#606060");
     ColorMath = QColor(0x00,0x80, 0x00);

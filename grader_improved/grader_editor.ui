@@ -22,8 +22,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
+     <x>1</x>
+     <y>1</y>
      <width>401</width>
      <height>181</height>
     </rect>
@@ -32,6 +32,24 @@
     <property name="spacing">
      <number>1</number>
     </property>
+    <item row="4" column="0">
+     <widget class="QPushButton" name="see_errors_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:focus { 
+  border-style: outset;
+}</string>
+      </property>
+      <property name="text">
+       <string>See &amp;Errors</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="marks_label">
       <property name="minimumSize">
@@ -131,22 +149,22 @@
       </property>
       <item>
        <property name="text">
-        <string>t</string>
+        <string>T</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>m</string>
+        <string>M</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>b</string>
+        <string>B</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>c</string>
+        <string>C</string>
        </property>
       </item>
      </widget>
@@ -252,24 +270,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item row="4" column="0">
-     <widget class="QPushButton" name="see_errors_btn">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::TabFocus</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
-      </property>
-      <property name="text">
-       <string>See &amp;Errors</string>
-      </property>
-     </widget>
     </item>
     <item row="2" column="1" rowspan="3">
      <widget class="QTextEdit" name="comment_text">

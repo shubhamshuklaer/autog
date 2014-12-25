@@ -16,13 +16,12 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList());
+    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),int start_grading_from=0);
     ~grader_editor();
     int current_index;
     int previous_comment_pos_index;
-    QString project_path,module_name;
+    QString project_path,module_name,module_dir_path,tex_compile_errors;
     QStringList files_list,marks_denominations_list;
-    QString out_dir_path,sub_tex_path,tex_compile_errors,main_tex_dir_path;
     grader_marks_widget *marks_widget;
     grader_file_sys *file_sys_interface;
     QThread *file_sys_thread;

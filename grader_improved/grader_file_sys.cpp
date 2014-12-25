@@ -29,17 +29,15 @@
 #include "grader_file_sys.h"
 
 
-grader_file_sys::grader_file_sys(QObject *parent,QString main_tex_dir_path,QString out_dir_path,QString sub_tex_path) :
+grader_file_sys::grader_file_sys(QObject *parent,QString module_dir_path) :
     QObject(parent)
 {
-    this->main_tex_dir_path=main_tex_dir_path;
-    this->out_dir_path=out_dir_path;
-    this->sub_tex_path=sub_tex_path;
+    this->module_dir_path=module_dir_path;
 }
 
 
 QString grader_file_sys::get_marks(QString file_name){
-    QFile sub_tex_file(this->out_dir_path+"/"+file_name+".tex");
+    QFile sub_tex_file(this->module_dir_path+"/"+file_name+".tex");
     QString marks=QString();
     this->sub_tex_files_edit_lock.lock();
     if(sub_tex_file.open(QIODevice::ReadOnly|QIODevice::Text)){
@@ -51,20 +49,15 @@ QString grader_file_sys::get_marks(QString file_name){
         marks=get_marks_pattern.match(sub_tex_content).captured(1);
     }else{
         this->sub_tex_files_edit_lock.unlock();
-        emit send_error(tr("couldn't open file ")+this->out_dir_path+"/"+file_name+".tex"+tr(" to read marks"));
-//        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" to read marks"));
+        emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" to read marks"));
     }
     return marks.simplified();
 }
 
 void grader_file_sys::put_marks(QString file_name, QString marks){
-    QFile file(this->out_dir_path+"/"+file_name+".tex");
+    QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        emit send_error(tr("couldn't Open ")+this->out_dir_path+"/"+file_name+".tex" +tr("for reading marks"));
-//        QMessageBox::warning(
-//                    qobject_cast<QWidget *> (this->parent()),
-//                    tr("Grader"),
-//                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex" +tr("for reading marks"));
+        emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex" +tr("for reading marks"));
         return ;
     }
     QTextStream input(&file);
@@ -78,11 +71,7 @@ void grader_file_sys::put_marks(QString file_name, QString marks){
     this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
         this->sub_tex_files_edit_lock.unlock();
-        emit send_error(tr("couldn't Open ")+this->out_dir_path+"/"+file_name+".tex"+tr("for writing marks"));
-//        QMessageBox::warning(
-//                    qobject_cast<QWidget *> (this->parent()),
-//                    tr("Grader"),
-//                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for writing marks"));
+        emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for writing marks"));
         return ;
     }
     QTextStream input1(&file);
@@ -93,13 +82,9 @@ void grader_file_sys::put_marks(QString file_name, QString marks){
 }
 
 void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos){
-    QFile file(this->out_dir_path+"/"+file_name+".tex");
+    QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        emit send_error(tr("couldn't Open ")+this->out_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
-//        QMessageBox::warning(
-//                    qobject_cast<QWidget *> (this->parent()),
-//                    tr("Grader"),
-//                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for reading comment"));
+        emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
         return ;
     }
     QTextStream input(&file);
@@ -107,23 +92,17 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     file.close();
     QRegularExpression pattern;
     QString replacement;
-    if(comment_pos=="c"){
-        //(?!foo) is negative lookahed
-        pattern=QRegularExpression("\\\\customcomment{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
-        replacement="\\customcomment{"+comment+"}\\nextcommandmarker";
-    }else{
-        //(?!foo) is negative lookahed
-        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
-        replacement="\\putcomment["+comment_pos+"]{"+comment+"}\\nextcommandmarker";
-    }
+
+    //(?!foo) is negative lookahed
+    pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
+    replacement="\\putcomment"+comment_pos+"{"+comment+"}\\nextcommandmarker";
+    qDebug() <<pattern;
     content.replace(pattern,replacement);
+    qDebug() <<content;
+
     this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-        emit send_error(tr("couldn't Open ")+this->out_dir_path+"/"+file_name+".tex"+tr("for writing comment"));
-//        QMessageBox::warning(
-//                    qobject_cast<QWidget *> (this->parent()),
-//                    tr("Grader"),
-//                    tr("couldn't Open ")+this->out_dir_name+"/"+file_name+".tex"+tr("for writing comment"));
+        emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for writing comment"));
         this->sub_tex_files_edit_lock.unlock();
         return ;
     }
@@ -135,9 +114,9 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
 }
 
 QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
-    QFile file(this->out_dir_path+"/"+file_name+".tex");
+    QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        emit send_error(tr("couldn't Open ")+this->out_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
+        emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
 //        QMessageBox::warning(
 //                    qobject_cast<QWidget *> (this->parent()),
 //                    tr("Grader"),
@@ -148,74 +127,23 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
     QString content=input.readAll();
     file.close();
     QRegularExpression pattern;
-    if(comment_pos=="c"){
-        //(?!foo) is negative lookahed
-        pattern=QRegularExpression("\\\\customcomment{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
-    }else{
-        //(?!foo) is negative lookahed
-        pattern=QRegularExpression("\\\\putcomment\\["+comment_pos+"]{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
-    }
+
+    //(?!foo) is negative lookahed
+    pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
+
     QRegularExpressionMatch comment_match=pattern.match(content);
     return comment_match.captured(1);
 }
 
 
-
-bool grader_file_sys::include_only(bool is_include_only,QString file_name){
-    this->main_tex_edit_lock.lock();
-    QFile main_pdf_tex_file(this->main_tex_dir_path+"/"+const_main_pdf_name+".tex");
-    if(!main_pdf_tex_file.open(QIODevice::ReadOnly|QIODevice::Text)){
-        this->main_tex_edit_lock.unlock();
-        emit send_error(tr("couldn't open file ")+this->main_tex_dir_path+"/"+const_main_pdf_name+".tex"+tr(" to read"));
-//        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->main_tex_dir_name+"/"+const_main_pdf_name+".tex"+tr(" to read"));
-        return false;
-    }
-    QTextStream main_pdf_tex_input_stream(&main_pdf_tex_file);
-    QString main_pdf_tex_content=main_pdf_tex_input_stream.readAll();
-    main_pdf_tex_file.close();
-    QRegularExpression include_only_pattern("\\\\includeonly{.*");
-    QString replacement;
-    if(!main_pdf_tex_content.contains(include_only_pattern)){
-        if(is_include_only){
-            replacement="\\includeonly{"+const_out_dir_name+"/"+file_name+"}";
-            main_pdf_tex_content=replacement+"\n"+main_pdf_tex_content;
-        }
-    }else{
-        if(is_include_only){
-            main_pdf_tex_content.replace(include_only_pattern,"\\includeonly{"+const_out_dir_name+"/"+file_name+"}");
-        }else{
-            main_pdf_tex_content.replace(include_only_pattern,"\\includeonly{"+const_out_dir_name+"/"+file_name+"}");
-        }
-    }
-
-    if(!main_pdf_tex_file.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Truncate)){
-        this->main_tex_edit_lock.unlock();
-        emit send_error(tr("couldn't open file ")+this->main_tex_dir_path+"/"+const_main_pdf_name+".tex"+tr(" to write"));
-        //        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->main_tex_dir_name+"/"+const_main_pdf_name+".tex"+tr(" to write"));
-        return false;
-    }
-
-    QTextStream main_pdf_tex_output_stream(&main_pdf_tex_file);
-    main_pdf_tex_output_stream<<main_pdf_tex_content;
-    main_pdf_tex_file.flush();
-    main_pdf_tex_file.close();
-    this->main_tex_edit_lock.unlock();
-    return true;
-}
-
-
-
 QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
-    bool is_include_only=true;
     put_marks(file_name,marks);
     put_comment(file_name,comment_text,comment_pos);
-    include_only(is_include_only,file_name);
-
 
     QProcess process;
-    process.setWorkingDirectory(this->main_tex_dir_path);
+    process.setWorkingDirectory(this->module_dir_path);
     this->tex_compile_lock.lock();
-    process.start(latex_compile_command+" "+const_main_pdf_name+".tex");
+    process.start(latex_compile_command+" "+file_name+".tex");
     process.waitForFinished(-1);
     this->tex_compile_lock.unlock();
     QString temp_tex_errors;
@@ -227,61 +155,69 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
         QRegularExpressionMatch match = error_iterator.next();
         error=error+ match.captured(0)+"\n";
     }
-    emit send_tex_error(error);
+    if( error != NULL ){
+        error=tr( "Compile command :")+latex_compile_command+
+                " "+const_main_pdf_name+".tex"+ "\n" + tr(" Errors :")+"\n" + error;
+    }
+
+    emit send_tex_compile_error(error);
+
+//    QFile::remove(this->module_dir_path+"/"+const_build_dir_name)
+
     return error;
 }
 
 
 
-void grader_file_sys::fix_file(QString file_name){
-    QDir out_dir(this->out_dir_path);
-    if(out_dir.exists(file_name+".tex")){
-        if(!out_dir.remove(file_name+".tex")){
-            emit send_error(tr("couldn't file ")+this->out_dir_path+"/"+file_name+".tex"+tr(" exists and couldn't be removed for overwriting"));
-//            QMessageBox::warning(
-//                        qobject_cast<QWidget *> (this->parent()),
-//                        tr("Error"),
-//                        tr("couldn't file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" exists and couldn't be removed for overwriting"));
-            return;
-        }
-    }
+void grader_file_sys::fix_file(QString file_name,QString marks_denominations){
+//    QDir out_dir(this->module_dir_path);
+//    if(out_dir.exists(file_name+".tex")){
+//        if(!out_dir.remove(file_name+".tex")){
+//            emit send_error(tr("couldn't file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" exists and couldn't be removed for overwriting"));
+////            QMessageBox::warning(
+////                        qobject_cast<QWidget *> (this->parent()),
+////                        tr("Error"),
+////                        tr("couldn't file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" exists and couldn't be removed for overwriting"));
+//            return;
+//        }
+//    }
 
-    if(!QFile::copy(this->sub_tex_path,this->out_dir_path+"/"+file_name+".tex")){
-        emit send_error(tr("couldn't copy file from ")+this->sub_tex_path+tr(" to ")+this->out_dir_path+"/"+file_name+".tex");
-//        QMessageBox::warning(
-//                    qobject_cast<QWidget *> (this->parent()),
-//                    tr("Error"),
-//                    tr("couldn't copy file from ")+this->sub_tex_path+tr(" to ")+this->out_dir_name+"/"+file_name+".tex");
-        return;
-    }
-    //putting put page
+//    if(!QFile::copy(this->sub_tex_path,this->module_dir_path+"/"+file_name+".tex")){
+//        emit send_error(tr("couldn't copy file from ")+this->sub_tex_path+tr(" to ")+this->module_dir_path+"/"+file_name+".tex");
+////        QMessageBox::warning(
+////                    qobject_cast<QWidget *> (this->parent()),
+////                    tr("Error"),
+////                    tr("couldn't copy file from ")+this->sub_tex_path+tr(" to ")+this->out_dir_name+"/"+file_name+".tex");
+//        return;
+//    }
+//    //putting put page
 
-    QFile sub_tex_file(this->out_dir_path+"/"+file_name+".tex");
+//    QFile sub_tex_file(this->module_dir_path+"/"+file_name+".tex");
 
-    if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        emit send_error(tr("couldn't open file ")+this->out_dir_path+"/"+file_name+".tex"+tr(" for read"));
-//        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" for read"));
-        return;
-    }
+//    if(!sub_tex_file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" for read"));
+////        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" for read"));
+//        return;
+//    }
 
-    QTextStream sub_tex_input_stream(&sub_tex_file);
-    QString sub_tex_content=sub_tex_input_stream.readAll();
-    sub_tex_file.close();
+//    QTextStream sub_tex_input_stream(&sub_tex_file);
+//    QString sub_tex_content=sub_tex_input_stream.readAll();
+//    sub_tex_file.close();
 
-    if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-        emit send_error(tr("couldn't open file ")+this->out_dir_path+"/"+file_name+".tex"+tr(" for read"));
-//        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" for read"));
-        return;
-    }
+//    if(!sub_tex_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+//        emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" for read"));
+////        QMessageBox::warning(qobject_cast<QWidget *> (this->parent()),tr("Error"),tr("couldn't open file ")+this->out_dir_name+"/"+file_name+".tex"+tr(" for read"));
+//        return;
+//    }
 
 
-    QTextStream sub_tex_output_stream(&sub_tex_file);
-    QRegularExpression put_page_pattern("\\\\putpage{.*");
-    qDebug()<<"Sub tex content"<<sub_tex_content;
-    sub_tex_content.replace(put_page_pattern,"\\putpage{"+file_name+"}");
-    qDebug()<<sub_tex_content;
-    sub_tex_output_stream<<sub_tex_content;
+//    QTextStream sub_tex_output_stream(&sub_tex_file);
+//    QRegularExpression put_page_pattern("\\\\putpage{.*");
+//    qDebug()<<"Sub tex content"<<sub_tex_content;
+//    sub_tex_content.replace(put_page_pattern,"\\putpage{"+file_name+"}");
+//    qDebug()<<sub_tex_content;
+//    sub_tex_output_stream<<sub_tex_content;
 
-    sub_tex_file.flush();
-    sub_tex_file.close();
+//    sub_tex_file.flush();
+//    sub_tex_file.close();
 }

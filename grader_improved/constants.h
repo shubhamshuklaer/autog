@@ -7,6 +7,7 @@ extern QChar id_marks_delimiter;
 extern QChar marks_denominations_delemiter;
 extern QChar settings_delemiter;
 
+extern QString const_build_dir_name;
 extern QString const_bursts_dir_name;
 extern QString const_main_pdf_name;
 extern QString const_out_dir_name;

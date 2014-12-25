@@ -40,7 +40,8 @@
 
 grader_editor::grader_editor( QWidget *parent, QString project_path,
                               QString module_name, QStringList files_list,
-                                        QStringList marks_denominations_list ) :
+                                        QStringList marks_denominations_list,
+                                                    int start_grading_from ) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
@@ -50,38 +51,34 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->files_list=files_list;
     this->marks_denominations_list=marks_denominations_list;
 
-    qDebug()<<marks_denominations_list;
 
-    this->out_dir_path=project_path+"/"+module_name+"/"+const_out_dir_name;
-    this->main_tex_dir_path=project_path+"/"+module_name;
-    this->current_index=0;
-    this->sub_tex_path=project_path+"/"+const_sub_tex_name;
+    this->module_dir_path=project_path+"/"+module_name;
+    this->current_index=start_grading_from;
     this->ui->file_name_combo->addItems(this->files_list);
-    this->ui->file_name_combo->setCurrentIndex(0);
+    this->ui->file_name_combo->setCurrentIndex(start_grading_from);
     this->marks_widget=NULL;
 
     this->file_sys_thread= new QThread(this);
     //I have set the parent as null cause we can't move a object
     //with parent to a different thread
-    this->file_sys_interface=new grader_file_sys(NULL,
-                                                this->main_tex_dir_path,
-                                                    this->out_dir_path,
-                                                        this->sub_tex_path );
+    this->file_sys_interface=new grader_file_sys(NULL, this->module_dir_path );
     //QObject::moveToThread: Cannot move objects with a parent
     this->file_sys_interface->moveToThread(this->file_sys_thread);
-    connect( this->file_sys_interface, SIGNAL( send_tex_error( QString ) ),
+    connect( this->file_sys_interface, SIGNAL( send_tex_compile_error( QString ) ),
                                 this, SLOT( set_tex_compile_error( QString ) ) );
     connect( this->file_sys_interface, SIGNAL( send_error( QString ) ),
                                   this, SLOT( display_errors_slot( QString ) ) );
     this->file_sys_thread->start();
 
-    setup_marks_widget(0);
+    setup_marks_widget(this->current_index);
 
     this->ui->comment_text->setText(this->file_sys_interface->get_comment(
-                                                    this->files_list[0], "t" ) );
+                                    this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0) ) );
+
     if(this->current_index+1>=this->files_list.length())
         this->ui->next_btn->setEnabled(false);
-    this->ui->prev_btn->setEnabled(false);
+    if( this->current_index == 0 )
+        this->ui->prev_btn->setEnabled(false);
 
     QCompleter *completer;
     completer=new QCompleter(this->ui->file_name_combo);
@@ -103,7 +100,8 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
                 new grader_combo_validator( this->ui->comment_pos_combo,
                                         this->ui->comment_pos_combo->model() ) );
 
-    LightLatexHighlighter *highlighter=new LightLatexHighlighter(this->ui->comment_text->document());
+    LightLatexHighlighter *highlighter=new LightLatexHighlighter(
+                                            this->ui->comment_text->document() );
 
 }
 
@@ -136,7 +134,7 @@ void grader_editor::on_next_btn_clicked()
         this->ui->comment_text->setText(this->file_sys_interface->
                                   get_comment(
                                       this->files_list[this->current_index],
-                                                                        "t") );
+                                                                        this->ui->comment_pos_combo->itemText(0)) );
     }
 }
 
@@ -162,7 +160,7 @@ void grader_editor::on_prev_btn_clicked()
         this->ui->comment_text->setText(this->file_sys_interface->
                                   get_comment(
                                       this->files_list[this->current_index],
-                                                                        "t") );
+                                                                        this->ui->comment_pos_combo->itemText(0)) );
     }
 }
 
@@ -175,12 +173,14 @@ void grader_editor::on_preview_btn_clicked()
                                 this->ui->comment_pos_combo->currentIndex() ) );
 
 
-    if( ! QDesktopServices::openUrl( QUrl( "file:///" + this->main_tex_dir_path +
-                                       "/" + const_main_pdf_name + ".pdf",
+    if( ! QDesktopServices::openUrl( QUrl( "file:///" + this->module_dir_path +
+                                       "/" + const_build_dir_name + "/" +
+                                                this->files_list[this->current_index] + ".pdf",
                                                         QUrl::TolerantMode ) ) ){
 
-        display_error( tr( "couldn't open file " ) + this->main_tex_dir_path +
-                                            "/" + const_main_pdf_name + ".pdf" );
+        display_error( tr( "couldn't open file " ) + this->module_dir_path +
+                                        "/" + const_build_dir_name + "/" +
+                                                    this->files_list[this->current_index] + ".pdf");
     }
 }
 
@@ -217,7 +217,7 @@ void grader_editor::on_file_name_combo_activated(int index)
             this->previous_comment_pos_index=0;
 
             this->ui->comment_text->setText( this->file_sys_interface->get_comment(
-                                       this->files_list[this->current_index], "t" ) );
+                                       this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0) ) );
         }
     }
 }
@@ -226,7 +226,8 @@ void grader_editor::on_file_name_combo_activated(int index)
 void grader_editor::on_fix_file_btn_clicked()
 {
     //overwrite file by default version
-    this->file_sys_interface->fix_file( this->files_list[this->current_index] );
+    this->file_sys_interface->fix_file( this->files_list[this->current_index],
+                                this->marks_denominations_list[this->current_index] );
 
     generate_pdf( true, this->files_list[this->current_index],
             this->marks_widget->property( "marks" ).toString(),
@@ -278,11 +279,11 @@ void grader_editor::setup_marks_widget(int index){
 void grader_editor::on_open_tex_btn_clicked()
 {
     if( ! QDesktopServices::openUrl( QUrl( "file:///" +
-                                  this->out_dir_path + "/" +
+                                  this->module_dir_path + "/" +
                                        this->files_list[this->current_index] +
                                                 ".tex", QUrl::TolerantMode ) ) ){
 
-        display_error( tr( "couldn't open file " ) + this->out_dir_path +
+        display_error( tr( "couldn't open file " ) + this->module_dir_path +
                             "/" + this->files_list[this->current_index] + ".tex" );
 
     }
@@ -305,6 +306,7 @@ void grader_editor::on_comment_text_textChanged()
                             this->ui->comment_pos_combo->itemText(
                                 this->ui->comment_pos_combo->currentIndex() ) );
 }
+
 
 void grader_editor::on_comment_pos_combo_activated(int index)
 {
@@ -362,6 +364,7 @@ void grader_editor::generate_pdf(bool async, QString file_name, QString marks,
                                                                     comment_pos );
     }
 }
+
 
 void grader_editor::set_tex_compile_error(QString error){
     this->tex_compile_errors_lock.lock();

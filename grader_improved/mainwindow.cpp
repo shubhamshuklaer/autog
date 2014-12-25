@@ -24,6 +24,25 @@
 #include "grader_editor.h"
 #include "grader_project_load.h"
 
+
+QChar id_marks_delimiter=';';
+QChar marks_denominations_delemiter='+';
+QChar settings_delemiter=':';
+
+QString const_build_dir_name="build";
+QString const_bursts_dir_name="bursts";
+QString const_main_pdf_name="main_pdf";
+QString const_out_dir_name="texfiles";
+QString const_sub_tex_name="sub_file.tex";
+QString const_top_tex_name="preamble.tex";
+QString module_config_file_name=".TexFileSequence.csv";
+QString project_config_file_name=".subModulesList.csv";
+QString settings_file_name="settings.config";
+QString latex_compile_command=
+     "pdflatex -file-line-error -interaction=nonstopmode -output-directory "
+                                                          +const_build_dir_name;
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -45,6 +64,8 @@ void MainWindow::setup_done(){
     this->files_list=this->project_load_widget->property("files_list").toStringList();
     this->marks_denominations_list=this->project_load_widget->property(
                 "marks_denominations_list").toStringList();
+    this->start_grading_from=this->project_load_widget->property(
+                                                        "start_grading_from").toInt();
     delete this->project_load_widget;
     this->setWindowTitle(this->module_name);
     this->editor_widget=new grader_editor(this,this->project_path,this->module_name,
