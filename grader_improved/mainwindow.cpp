@@ -69,7 +69,9 @@ void MainWindow::setup_done(){
     delete this->project_load_widget;
     this->setWindowTitle(this->module_name);
     this->editor_widget=new grader_editor(this,this->project_path,this->module_name,
-                                          this->files_list,this->marks_denominations_list);
+                                          this->files_list,
+                                          this->marks_denominations_list,
+                                                            this->start_grading_from);
     this->editor_widget->show();
     this->setFixedWidth(this->editor_widget->size().width());
     this->setFixedHeight(this->editor_widget->size().height());

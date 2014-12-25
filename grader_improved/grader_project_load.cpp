@@ -317,7 +317,8 @@ bool grader_project_load::setup_module(){
 
         if( !got_grading_start ){
             QRegularExpression put_marks_pattern("\\\\putmarks{(.*)}");
-            if( marking_scheme_pattern.match( tex_file_content ).captured(1) == NULL ){
+            qDebug() << put_marks_pattern.match( tex_file_content );
+            if( put_marks_pattern.match( tex_file_content ).captured(1) == NULL ){
                 got_grading_start=true;
             }
             start_grading_from++;

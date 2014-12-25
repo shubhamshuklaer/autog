@@ -96,9 +96,7 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     //(?!foo) is negative lookahed
     pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
     replacement="\\putcomment"+comment_pos+"{"+comment+"}\\nextcommandmarker";
-    qDebug() <<pattern;
     content.replace(pattern,replacement);
-    qDebug() <<content;
 
     this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
