@@ -11,7 +11,8 @@ public:
     explicit grader_file_sys(QObject *parent = 0,QString module_dir_path=QString());
     QString get_marks(QString file_name);
     QString get_comment(QString file_name,QString comment_pos);
-    void fix_file(QString file_name,QString marks_denominations);
+    void open_pdf();
+    void open_tex_file(QString file_name);
     Q_INVOKABLE void put_marks(QString file_name , QString marks);
     Q_INVOKABLE void put_comment(QString file_name , QString comment,QString comment_pos);
     Q_INVOKABLE QString generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos);

@@ -22,8 +22,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>1</x>
-     <y>1</y>
+     <x>0</x>
+     <y>0</y>
      <width>401</width>
      <height>181</height>
     </rect>
@@ -41,9 +41,7 @@
        <enum>Qt::TabFocus</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
+       <string notr="true"/>
       </property>
       <property name="text">
        <string>See &amp;Errors</string>
@@ -183,9 +181,7 @@
          <enum>Qt::TabFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>&amp;Previous</string>
@@ -198,32 +194,10 @@
          <enum>Qt::TabFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}
-</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Open &amp;tex</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="fix_file_btn">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}
-</string>
-        </property>
-        <property name="text">
-         <string>&amp;Fix file</string>
         </property>
        </widget>
       </item>
@@ -239,9 +213,7 @@
          <enum>Qt::TabFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Previe&amp;w</string>
@@ -260,9 +232,7 @@
          <enum>Qt::TabFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>&amp;Next</string>
@@ -291,7 +261,6 @@
   <tabstop>comment_text</tabstop>
   <tabstop>next_btn</tabstop>
   <tabstop>prev_btn</tabstop>
-  <tabstop>fix_file_btn</tabstop>
   <tabstop>preview_btn</tabstop>
   <tabstop>see_errors_btn</tabstop>
   <tabstop>open_tex_btn</tabstop>

@@ -119,6 +119,8 @@ bool grader_project_load::configure_project(QString project_location){
         return false;
     }
 
+    //to clear list before adding new items
+    this->ui->select_module_combo->clear();
     while(!config_text_stream.atEnd()){
         this->ui->select_module_combo->addItem(config_text_stream.readLine());
     }
@@ -317,7 +319,6 @@ bool grader_project_load::setup_module(){
 
         if( !got_grading_start ){
             QRegularExpression put_marks_pattern("\\\\putmarks{(.*)}");
-            qDebug() << put_marks_pattern.match( tex_file_content );
             if( put_marks_pattern.match( tex_file_content ).captured(1) == NULL ){
                 got_grading_start=true;
             }

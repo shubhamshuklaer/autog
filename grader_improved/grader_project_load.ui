@@ -48,16 +48,13 @@
         </sizepolicy>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}
-</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Select &amp;Project</string>
@@ -150,9 +147,7 @@
          <bool>false</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton:focus { 
-  border-style: outset;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>&amp;Start/Resume</string>

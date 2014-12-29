@@ -38,8 +38,6 @@ private slots:
 
     void on_file_name_combo_activated(int index);
 
-    void on_fix_file_btn_clicked();
-
     void on_see_errors_btn_clicked();
 
     void on_open_tex_btn_clicked();

@@ -33,7 +33,6 @@ HEADERS  += mainwindow.h \
     blockdata.h
 
 FORMS    += mainwindow.ui \
-    grader_setup.ui \
     grader_editor.ui \
     grader_marks_widget.ui \
     grader_project_load.ui

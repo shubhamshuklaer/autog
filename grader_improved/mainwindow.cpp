@@ -43,6 +43,11 @@ QString latex_compile_command=
                                                           +const_build_dir_name;
 
 
+
+//QString btn_stylesheet="QPushButton:focus {border-style: outset;}";
+QString btn_stylesheet="QPushButton:focus {border:0.5px;}";
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -51,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->project_load_widget=new grader_project_load(this);
     this->ui->centralWidget->setFixedSize(this->project_load_widget->size());
     connect( this->project_load_widget, SIGNAL(done()),this,SLOT(setup_done()));
+    this->setStyleSheet(btn_stylesheet);
 }
 
 MainWindow::~MainWindow()

@@ -19,7 +19,6 @@
 #include <QCompleter>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
@@ -28,7 +27,6 @@
 #include <QProcess>
 #include <QRegularExpression>
 #include <QTextStream>
-#include <QUrl>
 
 #include "constants.h"
 #include "grader_combo_validator.h"
@@ -173,15 +171,7 @@ void grader_editor::on_preview_btn_clicked()
                                 this->ui->comment_pos_combo->currentIndex() ) );
 
 
-    if( ! QDesktopServices::openUrl( QUrl( "file:///" + this->module_dir_path +
-                                       "/" + const_build_dir_name + "/" +
-                                                this->files_list[this->current_index] + ".pdf",
-                                                        QUrl::TolerantMode ) ) ){
-
-        display_error( tr( "couldn't open file " ) + this->module_dir_path +
-                                        "/" + const_build_dir_name + "/" +
-                                                    this->files_list[this->current_index] + ".pdf");
-    }
+    this->file_sys_interface->open_pdf();
 }
 
 
@@ -223,20 +213,6 @@ void grader_editor::on_file_name_combo_activated(int index)
 }
 
 
-void grader_editor::on_fix_file_btn_clicked()
-{
-    //overwrite file by default version
-    this->file_sys_interface->fix_file( this->files_list[this->current_index],
-                                this->marks_denominations_list[this->current_index] );
-
-    generate_pdf( true, this->files_list[this->current_index],
-            this->marks_widget->property( "marks" ).toString(),
-                        this->ui->comment_text->toPlainText(),
-                            this->ui->comment_pos_combo->itemText(
-                                this->ui->comment_pos_combo->currentIndex() ) );
-}
-
-
 
 void grader_editor::on_see_errors_btn_clicked()
 {
@@ -267,8 +243,7 @@ void grader_editor::setup_marks_widget(int index){
     QWidget::setTabOrder( this->ui->next_btn, this->ui->prev_btn );
     QWidget::setTabOrder( this->ui->prev_btn, this->ui->see_errors_btn );
     QWidget::setTabOrder( this->ui->see_errors_btn, this->ui->open_tex_btn );
-    QWidget::setTabOrder( this->ui->open_tex_btn, this->ui->fix_file_btn );
-    QWidget::setTabOrder( this->ui->fix_file_btn, this->ui->preview_btn );
+    QWidget::setTabOrder( this->ui->open_tex_btn, this->ui->preview_btn );
 
 
     this->marks_widget->show();
@@ -278,15 +253,7 @@ void grader_editor::setup_marks_widget(int index){
 
 void grader_editor::on_open_tex_btn_clicked()
 {
-    if( ! QDesktopServices::openUrl( QUrl( "file:///" +
-                                  this->module_dir_path + "/" +
-                                       this->files_list[this->current_index] +
-                                                ".tex", QUrl::TolerantMode ) ) ){
-
-        display_error( tr( "couldn't open file " ) + this->module_dir_path +
-                            "/" + this->files_list[this->current_index] + ".tex" );
-
-    }
+    this->file_sys_interface->open_tex_file(this->files_list[this->current_index]);
 }
 
 void grader_editor::on_marks_text_textChanged(){
