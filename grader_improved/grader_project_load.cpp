@@ -202,21 +202,6 @@ void grader_project_load::load_settings(){
         if(settings_iterator!=settings_dict.end())
             module_config_file_name=settings_iterator.value();
 
-        settings_iterator=settings_dict.find("const_out_dir_name");
-        if(settings_iterator!=settings_dict.end())
-            const_out_dir_name=settings_iterator.value();
-
-        settings_iterator=settings_dict.find("const_top_tex_name");
-        if(settings_iterator!=settings_dict.end())
-            const_top_tex_name=settings_iterator.value();
-
-        settings_iterator=settings_dict.find("const_sub_tex_name");
-        if(settings_iterator!=settings_dict.end())
-            const_sub_tex_name=settings_iterator.value();
-
-        settings_iterator=settings_dict.find("id_marks_delimiter");
-        if(settings_iterator!=settings_dict.end())
-            id_marks_delimiter=settings_iterator.value()[0];
 
         settings_iterator=settings_dict.find("marks_denominations_delemiter");
         if(settings_iterator!=settings_dict.end())
@@ -226,9 +211,9 @@ void grader_project_load::load_settings(){
         if(settings_iterator!=settings_dict.end())
             const_main_pdf_name=settings_iterator.value();
 
-        settings_iterator=settings_dict.find("const_bursts_dir_name");
+        settings_iterator=settings_dict.find("const_build_dir_name");
         if(settings_iterator!=settings_dict.end())
-            const_bursts_dir_name=settings_iterator.value();
+            const_build_dir_name=settings_iterator.value();
 
         settings_iterator=settings_dict.find("latex_compile_command");
         if(settings_iterator!=settings_dict.end())
@@ -240,13 +225,9 @@ void grader_project_load::load_settings(){
     current_settings+="Current settings are \n";
     current_settings+="settings_delemiter is   \""+QString(settings_delemiter)+"\"\n";
     current_settings+="\"module_config_file_name is   \""+module_config_file_name+"\"\n";
-    current_settings+="\"const_out_dir_name is   \""+const_out_dir_name+"\"\n";
-    current_settings+="\"const_top_tex_name is   \""+const_top_tex_name+"\"\n";
-    current_settings+="\"const_sub_tex_name is   \""+const_sub_tex_name+"\"\n";
-    current_settings+="\"id_marks_delimiter is   \""+QString(id_marks_delimiter)+"\"\n";
     current_settings+="\"marks_denominations_delemiter is   \""+QString(marks_denominations_delemiter)+"\"\n";
     current_settings+="\"const_main_pdf_name is   \""+const_main_pdf_name+"\"\n";
-    current_settings+="\"const_bursts_dir_name is   \""+const_bursts_dir_name+"\"\n";
+    current_settings+="\"const_build_dir_name is   \""+const_build_dir_name+"\"\n";
     current_settings+="\"latex_compile_command is   \""+latex_compile_command+"\"\n";
 
     QMessageBox::information(this,tr("Current settings"),current_settings);

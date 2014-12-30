@@ -158,34 +158,46 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
 
     emit send_tex_compile_error(error);
 
-    if( QFile::exists(this->module_dir_path + "/" +
-                      const_build_dir_name + "/" +
-                                    const_main_pdf_name + ".pdf" ) ){
-        if ( ! QFile::remove(this->module_dir_path + "/" +
-                      const_build_dir_name + "/" +
-                                    const_main_pdf_name + ".pdf")){
+    if( error == NULL ){
+        qDebug()<<"Null error";
+        qDebug()<<temp_tex_errors;
+        if( QFile::exists(this->module_dir_path + "/" +
+                          const_build_dir_name + "/" +
+                                        const_main_pdf_name + ".pdf" ) ){
+            if ( ! QFile::remove(this->module_dir_path + "/" +
+                          const_build_dir_name + "/" +
+                                        const_main_pdf_name + ".pdf")){
 
-            emit send_error( this->module_dir_path + "/" +
-                             const_build_dir_name + "/" +
-                                  const_main_pdf_name + ".pdf" +
-                       tr( " exists and couldn't be removed for overwriting" ) );
+                emit send_error( this->module_dir_path + "/" +
+                                 const_build_dir_name + "/" +
+                                      const_main_pdf_name + ".pdf" +
+                           tr( " exists and couldn't be removed for overwriting" ) );
 
+            }
         }
-    }
-
-    if( ! QFile::copy(this->module_dir_path + "/" +
-                    const_build_dir_name + "/" +
-                      file_name + ".pdf", this->module_dir_path +
-                    "/" + const_build_dir_name + "/" +
-                         const_main_pdf_name + ".pdf" ) ){
-
-        emit send_error( tr("Couldn't copy file from ") +
-                         this->module_dir_path + "/" +
+        if( QFile::exists(this->module_dir_path + "/" +
+                                    const_build_dir_name + "/" +
+                                                        file_name + ".pdf") ){
+            if( ! QFile::copy(this->module_dir_path + "/" +
                             const_build_dir_name + "/" +
-                              file_name + ".pdf"+
-                            tr(" to ") + this->module_dir_path +
-                         "/" + const_build_dir_name + "/" +
-                              const_main_pdf_name + ".pdf");
+                              file_name + ".pdf", this->module_dir_path +
+                            "/" + const_build_dir_name + "/" +
+                                 const_main_pdf_name + ".pdf" ) ){
+
+                emit send_error( tr("Couldn't copy file from ") +
+                                 this->module_dir_path + "/" +
+                                    const_build_dir_name + "/" +
+                                      file_name + ".pdf"+
+                                    tr(" to ") + this->module_dir_path +
+                                 "/" + const_build_dir_name + "/" +
+                                      const_main_pdf_name + ".pdf");
+            }
+        }else{
+            emit send_error( tr("file ") +
+                             this->module_dir_path + "/" +
+                                const_build_dir_name + "/" +
+                                  file_name + ".pdf"+ tr(" dosen't exist"));
+        }
     }
 
     return error;
