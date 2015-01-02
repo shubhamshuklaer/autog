@@ -135,7 +135,7 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
 QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
     bool process_success;
 
-    QString temp_tex_errors,error;
+    QString tex_compile_output,error;
 
     put_marks(file_name,marks);
     put_comment(file_name,comment_text,comment_pos);
@@ -155,13 +155,18 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
         return error;
     }
 
-    temp_tex_errors=process.readAllStandardOutput();
-    QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*",QRegularExpression::MultilineOption);
-    QRegularExpressionMatchIterator error_iterator=error_pattern.globalMatch(temp_tex_errors);
+    tex_compile_output=process.readAllStandardOutput();
+
+    QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*|!.*",QRegularExpression::MultilineOption);
+
+
+    QRegularExpressionMatchIterator error_iterator=error_pattern.globalMatch(tex_compile_output);
     while (error_iterator.hasNext()) {
         QRegularExpressionMatch match = error_iterator.next();
         error=error+ match.captured(0)+"\n";
     }
+
+
     if( error != NULL ){
         error=tr( "Compile command :\n")+latex_compile_command+
                 " "+file_name+".tex"+ "\n\n" + tr(" Errors :")+"\n" + error;
@@ -170,8 +175,6 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     emit send_tex_compile_error(error);
 
     if( error == NULL ){
-        qDebug()<<"Null error";
-        qDebug()<<temp_tex_errors;
         if( QFile::exists(this->module_dir_path + "/" +
                           const_build_dir_name + "/" +
                                         const_main_pdf_name + ".pdf" ) ){
