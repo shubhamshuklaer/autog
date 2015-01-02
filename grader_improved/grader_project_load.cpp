@@ -220,6 +220,10 @@ void grader_project_load::load_settings(){
         if(settings_iterator!=settings_dict.end())
             latex_compile_command=settings_iterator.value();
 
+        settings_iterator=settings_dict.find("const_tex_compile_timeout");
+        if(settings_iterator!=settings_dict.end())
+            const_tex_compile_timeout=settings_iterator.value().toInt();
+
     }
 
 
@@ -230,6 +234,7 @@ void grader_project_load::load_settings(){
     current_settings+="\"const_main_pdf_name is   \""+const_main_pdf_name+"\"\n";
     current_settings+="\"const_build_dir_name is   \""+const_build_dir_name+"\"\n";
     current_settings+="\"latex_compile_command is   \""+latex_compile_command+"\"\n";
+    current_settings+="\"const_tex_compile_timeout is   \""+QString::number(const_tex_compile_timeout)+tr(" msecs")+"\"\n";
 
     QMessageBox::information(this,tr("Current settings"),current_settings);
 

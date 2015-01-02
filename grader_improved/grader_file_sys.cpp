@@ -133,6 +133,10 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
 
 
 QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
+    bool process_success;
+
+    QString temp_tex_errors,error;
+
     put_marks(file_name,marks);
     put_comment(file_name,comment_text,comment_pos);
 
@@ -140,13 +144,20 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     process.setWorkingDirectory(this->module_dir_path);
     this->tex_compile_lock.lock();
     process.start(latex_compile_command+" "+file_name+".tex");
-    process.waitForFinished(-1);
+    process_success=process.waitForFinished(const_tex_compile_timeout);
     this->tex_compile_lock.unlock();
-    QString temp_tex_errors;
+    if( ! process_success ){
+        error=tr( "Compile command :\n")+latex_compile_command+
+                " "+file_name+".tex"+ "\n\n" + tr(" Errors :")+"\n";
+        error=error + tr( "compilation timed out after ") + QString::number(const_tex_compile_timeout) + tr("msecs" ) ;
+        emit send_tex_compile_error(error);
+        process.close();
+        return error;
+    }
+
     temp_tex_errors=process.readAllStandardOutput();
     QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*",QRegularExpression::MultilineOption);
     QRegularExpressionMatchIterator error_iterator=error_pattern.globalMatch(temp_tex_errors);
-    QString error;
     while (error_iterator.hasNext()) {
         QRegularExpressionMatch match = error_iterator.next();
         error=error+ match.captured(0)+"\n";

@@ -28,6 +28,9 @@
 QChar marks_denominations_delemiter='+';
 QChar settings_delemiter=':';
 
+int const_tex_compile_timeout=20000;//in milliseconds
+
+
 QString const_build_dir_name="build";
 QString const_main_pdf_name="main_pdf";
 QString module_config_file_name=".TexFileSequence.csv";
