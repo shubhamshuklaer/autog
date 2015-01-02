@@ -42,6 +42,7 @@ grader_project_load::grader_project_load(QWidget *parent) :
     module_name_completer->setCompletionMode( QCompleter::PopupCompletion );
     module_name_completer->setCaseSensitivity( Qt::CaseInsensitive );
     module_name_completer->setModel( this->ui->select_module_combo->model() );
+    module_name_completer->setFilterMode( Qt::MatchContains );
     this->ui->select_module_combo->setCompleter( module_name_completer );
 
     this->ui->select_module_combo->setValidator( new

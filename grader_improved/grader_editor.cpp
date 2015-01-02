@@ -83,6 +83,7 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     completer->setCompletionMode(QCompleter::PopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->file_name_combo->model());
+    completer->setFilterMode( Qt::MatchContains );
     this->ui->file_name_combo->setCompleter(completer);
     this->ui->file_name_combo->setValidator(
                 new grader_combo_validator( this->ui->file_name_combo,
@@ -93,6 +94,7 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     completer->setCompletionMode(QCompleter::PopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModel(this->ui->comment_pos_combo->model());
+    completer->setFilterMode( Qt::MatchContains );
     this->ui->comment_pos_combo->setCompleter(completer);
     this->ui->comment_pos_combo->setValidator(
                 new grader_combo_validator( this->ui->comment_pos_combo,
