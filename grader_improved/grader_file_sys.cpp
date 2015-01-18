@@ -148,8 +148,15 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     this->tex_compile_lock.unlock();
     if( ! process_success ){
         error=tr( "Compile command :\n")+latex_compile_command+
-                " "+file_name+".tex"+ "\n\n" + tr(" Errors :")+"\n";
-        error=error + tr( "compilation timed out after ") + QString::number(const_tex_compile_timeout) + tr("msecs" ) ;
+            " "+file_name+".tex"+ "\n\n" + tr(" Errors :")+"\n";
+        int error_code=process.error();
+        if( error_code == 2 ){
+            error=error + tr( "compilation timed out after ") + QString::number(const_tex_compile_timeout) + tr("msecs" ) ;
+        }else if( error_code == 0 ){
+            error=error + tr( "Process failed to start" );
+        }else if( error_code == 1 ){
+            error=error + tr("Process crashed");
+        }
         emit send_tex_compile_error(error);
         process.close();
         return error;

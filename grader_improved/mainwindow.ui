@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Grader</string>
+   <string>AutoG</string>
   </property>
   <widget class="QWidget" name="centralWidget"/>
   <action name="config">

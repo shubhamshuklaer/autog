@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=AutoG
+GenericName=AutoG
+Comment=Interface to computerized grading system made by my teacher
+Icon=/usr/share/autog/data/icon.png
+Exec=autog
+Terminal=false
+Type=Application
+Categories=Qt;Utility;

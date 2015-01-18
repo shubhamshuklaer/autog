@@ -1,0 +1,14 @@
+Source: autog
+Section: utils
+Priority: optional
+Maintainer: Shubham Shukla (Student) <shubhamshuklaerssss@gmail.com>
+Build-Depends: debhelper (>= 9), qtdeclarative5-dev (>=5.2), qt5-default (>=5.2), cdbs
+Standards-Version: 3.9.5
+Homepage: 
+#Vcs-Git: git://git.debian.org/collab-maint/autog.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/autog.git;a=summary
+
+Package: autog
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qt5-default (>=5.2)
+Description: A interface for the computerized grading system developed by my teacher

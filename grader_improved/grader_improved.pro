@@ -8,7 +8,16 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = grader_improved
+TARGET = autog
+target.path = /usr/bin
+INSTALLS += target
+data.path = /usr/share/autog/data
+data.files += data/COPYING.txt
+data.files += data/icon.png
+INSTALLS += data
+shortcutfiles.path = /usr/share/applications/
+shortcutfiles.files = data/autog.desktop
+INSTALLS += shortcutfiles
 TEMPLATE = app
 
 
