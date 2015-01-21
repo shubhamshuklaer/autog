@@ -10,5 +10,5 @@ Homepage:
 
 Package: autog
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, qt5-default (>=5.2)
+Depends: ${shlibs:Depends}, libglib2.0-0 (>= 2.22.0), libicu52 (>= 52~m1-1~), libgl1-mesa-glx
 Description: A interface for the computerized grading system developed by my teacher
