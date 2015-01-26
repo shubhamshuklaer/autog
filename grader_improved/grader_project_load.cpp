@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QRegularExpression>
+#include <QSettings>
 #include <QTextStream>
 
 #include "constants.h"
@@ -61,17 +62,25 @@ grader_project_load::~grader_project_load(){
 
 
 void grader_project_load::select_project_btn_clicked(){
+    QSettings project_settings("project_settings");
     QDir selected_dir;
-    QString dir_path;
+    QString dir_path,previous_path;
+
+    previous_path=project_settings.value("previous_path").toString();
+
+    if(previous_path=="")
+        previous_path="/home";
 
     dir_path = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                 "",
+                                                 previous_path,
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
 
     if( dir_path != NULL ){
 
         selected_dir=QDir(dir_path);
+        project_settings.setValue("previous_path",dir_path);
+
         if( selected_dir.exists( project_config_file_name ) ){
             this->ui->project_dir_path->setText(dir_path);
             if( configure_project( dir_path ) ){
