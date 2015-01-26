@@ -5,6 +5,7 @@
 
 extern QChar marks_denominations_delemiter;
 extern QChar settings_delemiter;
+extern QChar const_comment_char;
 
 extern int const_tex_compile_timeout;
 

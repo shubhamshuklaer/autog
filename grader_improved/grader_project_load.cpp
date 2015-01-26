@@ -65,7 +65,7 @@ void grader_project_load::select_project_btn_clicked(){
     QString dir_path;
 
     dir_path = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                 "/home",
+                                                 "",
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
 
@@ -190,9 +190,11 @@ void grader_project_load::load_settings(){
         while(!settings_file_stream.atEnd()){
             temp_line=settings_file_stream.readLine().trimmed();
             if(temp_line!=NULL){
-                temp_split=temp_line.split(settings_delemiter);
-                if( temp_split.size() == 2 && temp_split[1] != NULL)
-                    settings_dict.insert( temp_split[0].trimmed(), temp_split[1].trimmed() );
+                if(temp_line[0]!=const_comment_char){//ignoring comment lines
+                    temp_split=temp_line.split(settings_delemiter);
+                    if( temp_split.size() == 2 && temp_split[1] != NULL)
+                        settings_dict.insert( temp_split[0].trimmed(), temp_split[1].trimmed() );
+                }
             }
         }
 
