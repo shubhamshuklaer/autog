@@ -1,6 +1,6 @@
 #!/bin/bash
 echo $#
-if [ $# -ne 2 ]
+if [ $# -ne 3 ]
 then
     echo "Please pass proper arguments"
     exit -1
@@ -10,6 +10,16 @@ cp -R grader_improved launchpad/$1
 cd launchpad/$1
 
 cp ../../default_desktop_file data/autog.desktop
+
+if [ $3 == "i386" ]
+then
+    cp -R data/i386/* data/
+elif [ $3 == "amd64" ]
+then
+    cp -R data/amd64/* data/
+fi
+
+rm -rf data/amd64 data/i386
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
@@ -31,9 +41,10 @@ cp ../../../default_copyright_file copyright
 cp ../../../default_rules_file rules
 chmod +x rules
 sed -i "1 s/unstable/$2/" "changelog" #1 only replaces the first line
+sed -i "s/^Architecture.*/Architecture: $3/" "control"
 cd ..
 
-#debuild -S
+debuild -S
 #cd ..
 #NEW=`echo $1|tr "-" "_"`
 #echo $NEW;
