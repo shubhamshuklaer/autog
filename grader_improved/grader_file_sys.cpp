@@ -48,7 +48,10 @@ QString grader_file_sys::get_marks(QString file_name,int index){
         sub_tex_file.close();
         this->sub_tex_files_edit_lock.unlock();
         QRegularExpression get_marks_pattern("\\\\putmarks{([^}]*)}");
-        marks=get_marks_pattern.match(sub_tex_content).captured(1);
+        QRegularExpressionMatchIterator it=get_marks_pattern.globalMatch(sub_tex_content);
+        for(int i=0;i<index;i++)
+            it.next();
+        marks=it.next().captured(1);
     }else{
         this->sub_tex_files_edit_lock.unlock();
         emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" to read marks"));
@@ -69,7 +72,15 @@ void grader_file_sys::put_marks(QString file_name, QString marks,int index){
     QString replacement;
     pattern=QRegularExpression("\\\\putmarks{[^}]*}");
     replacement="\\putmarks{"+marks.simplified()+"}";
-    content.replace(pattern,replacement);
+
+    QRegularExpressionMatchIterator it=pattern.globalMatch(content);
+    for(int i=0;i<index;i++)
+        it.next();
+    QRegularExpressionMatch match=it.next();
+    int match_start,match_length;
+    match_start=match.capturedStart(0);
+    match_length=match.capturedLength(0);
+    content.replace(match_start,match_length,replacement);
     this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
         this->sub_tex_files_edit_lock.unlock();
@@ -98,7 +109,15 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     //(?!foo) is negative lookahed
     pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{((?!}\\\\nextcommandmarker).)*}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
     replacement="\\putcomment"+comment_pos+"{"+comment+"}\\nextcommandmarker";
-    content.replace(pattern,replacement);
+
+    QRegularExpressionMatchIterator it=pattern.globalMatch(content);
+    for(int i=0;i<index;i++)
+        it.next();
+    QRegularExpressionMatch match=it.next();
+    int match_start,match_length;
+    match_start=match.capturedStart(0);
+    match_length=match.capturedLength(0);
+    content.replace(match_start,match_length,replacement);
 
     this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
@@ -127,8 +146,10 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos,int i
     //(?!foo) is negative lookahed
     pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
 
-    QRegularExpressionMatch comment_match=pattern.match(content);
-    return comment_match.captured(1);
+    QRegularExpressionMatchIterator it=pattern.globalMatch(content);
+    for(int i=0;i<index;i++)
+        it.next();
+    return it.next().captured(1);
 }
 
 
