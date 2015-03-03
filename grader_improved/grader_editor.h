@@ -6,6 +6,7 @@
 #include "grader_marks_widget.h"
 #include "grader_file_sys.h"
 #include <QThread>
+#include <QList>
 
 namespace Ui {
 class grader_editor;
@@ -16,12 +17,13 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),int start_grading_from=0);
+    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),QList<QStringList> merge_list=QList<QStringList>(),int start_grading_from=0);
     ~grader_editor();
     int current_index;
     int previous_comment_pos_index;
     QString project_path,module_name,module_dir_path,tex_compile_errors;
     QStringList files_list,marks_denominations_list;
+    QList<QStringList> merge_list;
     grader_marks_widget *marks_widget;
     grader_file_sys *file_sys_interface;
     QThread *file_sys_thread;
@@ -55,6 +57,7 @@ public slots:
 private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);
+    void setup_merge_widget(int index);
     void display_error(QString);
 
 

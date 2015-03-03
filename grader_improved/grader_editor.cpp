@@ -39,7 +39,7 @@
 grader_editor::grader_editor( QWidget *parent, QString project_path,
                               QString module_name, QStringList files_list,
                                         QStringList marks_denominations_list,
-                                                    int start_grading_from ) :
+                              QList<QStringList> merge_list,int start_grading_from ) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
@@ -48,6 +48,7 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->module_name=module_name;
     this->files_list=files_list;
     this->marks_denominations_list=marks_denominations_list;
+    this->merge_list=merge_list;
 
 
     this->module_dir_path=project_path+"/"+module_name;
@@ -71,7 +72,7 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     setup_marks_widget(this->current_index);
 
     this->ui->comment_text->setText(this->file_sys_interface->get_comment(
-                                    this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0) ) );
+                                    this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),1 ) );
 
     if(this->current_index+1>=this->files_list.length())
         this->ui->next_btn->setEnabled(false);
@@ -134,7 +135,7 @@ void grader_editor::on_next_btn_clicked()
         this->ui->comment_text->setText(this->file_sys_interface->
                                   get_comment(
                                       this->files_list[this->current_index],
-                                                                        this->ui->comment_pos_combo->itemText(0)) );
+                                                                        this->ui->comment_pos_combo->itemText(0),1) );
     }
 }
 
@@ -160,7 +161,7 @@ void grader_editor::on_prev_btn_clicked()
         this->ui->comment_text->setText(this->file_sys_interface->
                                   get_comment(
                                       this->files_list[this->current_index],
-                                                                        this->ui->comment_pos_combo->itemText(0)) );
+                                                                        this->ui->comment_pos_combo->itemText(0),1) );
     }
 }
 
@@ -209,7 +210,7 @@ void grader_editor::on_file_name_combo_activated(int index)
             this->previous_comment_pos_index=0;
 
             this->ui->comment_text->setText( this->file_sys_interface->get_comment(
-                                       this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0) ) );
+                                       this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),1 ) );
         }
     }
 }
@@ -231,7 +232,7 @@ void grader_editor::setup_marks_widget(int index){
                                         this->marks_denominations_list[index].split(
                                                     marks_denominations_delemiter ) );
     this->marks_widget->setProperty("marks",this->file_sys_interface->get_marks(
-                                                          this->files_list[index] ) );
+                                                          this->files_list[index],1 ) );
     this->marks_widget->setFixedSize(this->ui->marks_widget->size());
     connect( this->marks_widget, SIGNAL( marks_changed() ), this, SLOT(
                                                       on_marks_text_textChanged() ) );
@@ -287,13 +288,14 @@ void grader_editor::on_comment_pos_combo_activated(int index)
     this->previous_comment_pos_index=index;
     this->ui->comment_text->setText(this->file_sys_interface->get_comment(
                                         this->files_list[this->current_index],
-                                this->ui->comment_pos_combo->itemText( index ) ) );
+                                this->ui->comment_pos_combo->itemText( index ),1 ) );
 }
 
 
 
 void grader_editor::put_comment( bool async, QString file_name ,
                                         QString comment , QString comment_pos ){
+    int index=1;
     if(async){
         //Asynchronous function call
         //the call is posted as a event the the file sys interface thread
@@ -305,20 +307,21 @@ void grader_editor::put_comment( bool async, QString file_name ,
                                                                 method(method_index);
         method.invoke( this->file_sys_interface, Qt::QueuedConnection,
                             Q_ARG( QString, file_name ), Q_ARG( QString, comment ),
-                                                     Q_ARG( QString, comment_pos ) );
+                                                     Q_ARG( QString, comment_pos ), Q_ARG( int, index ) );
     }else{
-        this->file_sys_interface->put_comment(file_name,comment,comment_pos);
+        this->file_sys_interface->put_comment(file_name,comment,comment_pos,index);
     }
 }
 
 
 void grader_editor::generate_pdf(bool async, QString file_name, QString marks,
                                         QString comment_text, QString comment_pos ){
+    int index=1;
     if(async){
         //Asynchronous function call
         //the call is posted as a event the the file sys interface thread
         QByteArray normalizedSignature = QMetaObject::normalizedSignature(
-                            "generate_pdf( QString, QString, QString, QString )" );
+                            "generate_pdf( QString, QString, QString, QString, int )" );
         int method_index=this->file_sys_interface->metaObject()->indexOfMethod(
                                                                 normalizedSignature);
         QMetaMethod method=this->file_sys_interface->metaObject()->method(
@@ -327,10 +330,10 @@ void grader_editor::generate_pdf(bool async, QString file_name, QString marks,
         method.invoke(this->file_sys_interface, Qt::QueuedConnection,
                             Q_ARG( QString, file_name ), Q_ARG( QString, marks ),
                                         Q_ARG( QString, comment_text ),
-                                                  Q_ARG( QString, comment_pos ) );
+                                                  Q_ARG( QString, comment_pos ), Q_ARG( int, index ) );
     }else{
         this->file_sys_interface->generate_pdf( file_name, marks, comment_text,
-                                                                    comment_pos );
+                                                                    comment_pos, index);
     }
 }
 
@@ -361,4 +364,7 @@ void grader_editor::display_errors_slot(QString error){
 
 void grader_editor::display_error( QString error ){
     QMessageBox::critical( this, tr( "Error" ), error );
+}
+
+void grader_editor::setup_merge_widget(int index){
 }

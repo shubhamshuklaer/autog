@@ -38,7 +38,7 @@ grader_file_sys::grader_file_sys(QObject *parent,QString module_dir_path) :
 }
 
 
-QString grader_file_sys::get_marks(QString file_name){
+QString grader_file_sys::get_marks(QString file_name,int index){
     QFile sub_tex_file(this->module_dir_path+"/"+file_name+".tex");
     QString marks=QString();
     this->sub_tex_files_edit_lock.lock();
@@ -56,7 +56,7 @@ QString grader_file_sys::get_marks(QString file_name){
     return marks.simplified();
 }
 
-void grader_file_sys::put_marks(QString file_name, QString marks){
+void grader_file_sys::put_marks(QString file_name, QString marks,int index){
     QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex" +tr("for reading marks"));
@@ -83,7 +83,7 @@ void grader_file_sys::put_marks(QString file_name, QString marks){
     this->sub_tex_files_edit_lock.unlock();
 }
 
-void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos){
+void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos,int index){
     QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
@@ -113,7 +113,7 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     this->sub_tex_files_edit_lock.unlock();
 }
 
-QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
+QString grader_file_sys::get_comment(QString file_name,QString comment_pos,int index){
     QFile file(this->module_dir_path+"/"+file_name+".tex");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
@@ -132,13 +132,13 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos){
 }
 
 
-QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos){
+QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString comment_text,QString comment_pos,int index){
     bool process_success;
 
     QString tex_compile_output,error;
 
-    put_marks(file_name,marks);
-    put_comment(file_name,comment_text,comment_pos);
+    put_marks(file_name,marks,index);
+    put_comment(file_name,comment_text,comment_pos,index);
 
     QProcess process;
     process.setWorkingDirectory(this->module_dir_path);

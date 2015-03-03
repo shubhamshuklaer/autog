@@ -34,6 +34,7 @@ int const_tex_compile_timeout=20000;//in milliseconds
 
 QString const_build_dir_name="build";
 QString const_main_pdf_name="main_pdf";
+QString const_merge_pattern="\\\\setpanenumber{(.*)}";
 QString module_config_file_name=".TexFileSequence.csv";
 QString project_config_file_name=".SubModuleList.csv";
 QString settings_file_name=".Settings.csv";
@@ -69,13 +70,18 @@ void MainWindow::setup_done(){
     this->files_list=this->project_load_widget->property("files_list").toStringList();
     this->marks_denominations_list=this->project_load_widget->property(
                 "marks_denominations_list").toStringList();
+    QList<QVariant> temp_merge_list=this->project_load_widget->property("merge_list").toList();
+    QListIterator<QVariant> it(temp_merge_list);
+    while(it.hasNext()){
+        this->merge_list<<it.next().toStringList();
+    }
     this->start_grading_from=this->project_load_widget->property(
                                                         "start_grading_from").toInt();
     delete this->project_load_widget;
     this->setWindowTitle(this->module_name);
     this->editor_widget=new grader_editor(this,this->project_path,this->module_name,
                                           this->files_list,
-                                          this->marks_denominations_list,
+                                          this->marks_denominations_list,this->merge_list,
                                                             this->start_grading_from);
     this->editor_widget->show();
     this->setFixedWidth(this->editor_widget->size().width());
