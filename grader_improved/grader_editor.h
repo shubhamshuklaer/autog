@@ -7,6 +7,7 @@
 #include "grader_file_sys.h"
 #include <QThread>
 #include <QList>
+#include <QComboBox>
 
 namespace Ui {
 class grader_editor;
@@ -19,7 +20,7 @@ class grader_editor : public QWidget
 public:
     explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),QList<QStringList> merge_list=QList<QStringList>(),int start_grading_from=0);
     ~grader_editor();
-    int current_index;
+    int current_index,current_merge_index;
     int previous_comment_pos_index;
     QString project_path,module_name,module_dir_path,tex_compile_errors;
     QStringList files_list,marks_denominations_list;
@@ -28,6 +29,7 @@ public:
     grader_file_sys *file_sys_interface;
     QThread *file_sys_thread;
     QMutex tex_compile_errors_lock;
+    QComboBox *merge_combo_box;
     void put_comment(bool async,QString file_name , QString comment,QString comment_pos);
     void generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos);
 
@@ -50,6 +52,8 @@ private slots:
 
     void on_comment_pos_combo_activated(int index);
 
+    void on_merge_combo_activated(int index);
+
     void set_tex_compile_error(QString error);
 
 public slots:
@@ -58,6 +62,7 @@ private:
     Ui::grader_editor *ui;
     void setup_marks_widget(int index);
     void setup_merge_widget(int index);
+    int get_merge_index();
     void display_error(QString);
 
 

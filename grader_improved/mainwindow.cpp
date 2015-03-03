@@ -70,11 +70,7 @@ void MainWindow::setup_done(){
     this->files_list=this->project_load_widget->property("files_list").toStringList();
     this->marks_denominations_list=this->project_load_widget->property(
                 "marks_denominations_list").toStringList();
-    QList<QVariant> temp_merge_list=this->project_load_widget->property("merge_list").toList();
-    QListIterator<QVariant> it(temp_merge_list);
-    while(it.hasNext()){
-        this->merge_list<<it.next().toStringList();
-    }
+    this->merge_list=this->project_load_widget->property("merge_list").value<QList<QStringList> >();
     this->start_grading_from=this->project_load_widget->property(
                                                         "start_grading_from").toInt();
     delete this->project_load_widget;

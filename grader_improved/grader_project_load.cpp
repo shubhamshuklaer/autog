@@ -324,6 +324,7 @@ bool grader_project_load::setup_module(){
         QRegularExpressionMatchIterator it=merge_pattern.globalMatch(tex_file_content);
 
         QStringList temp_merge_list;
+
         while(it.hasNext()){
             QRegularExpressionMatch merge_pattern_match=it.next();
             temp_merge_list<<merge_pattern_match.captured(1);
