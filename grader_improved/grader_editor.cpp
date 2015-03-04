@@ -141,6 +141,12 @@ void grader_editor::on_next_btn_clicked()
                                   get_comment(
                                       this->files_list[this->current_index],
                                                                         this->ui->comment_pos_combo->itemText(0),get_merge_index()) );
+
+        generate_pdf( false, this->files_list[this->current_index],
+                this->marks_widget->property( "marks" ).toString(),
+                            this->ui->comment_text->toPlainText(),
+                                this->ui->comment_pos_combo->itemText(
+                                    this->ui->comment_pos_combo->currentIndex() ) );
     }
 }
 
@@ -168,6 +174,12 @@ void grader_editor::on_prev_btn_clicked()
                                   get_comment(
                                       this->files_list[this->current_index],
                                                                         this->ui->comment_pos_combo->itemText(0),get_merge_index()) );
+
+        generate_pdf( false, this->files_list[this->current_index],
+                this->marks_widget->property( "marks" ).toString(),
+                            this->ui->comment_text->toPlainText(),
+                                this->ui->comment_pos_combo->itemText(
+                                    this->ui->comment_pos_combo->currentIndex() ) );
     }
 }
 
@@ -219,6 +231,12 @@ void grader_editor::on_file_name_combo_activated(int index)
 
             this->ui->comment_text->setText( this->file_sys_interface->get_comment(
                                        this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),get_merge_index() ) );
+
+            generate_pdf( false, this->files_list[this->current_index],
+                    this->marks_widget->property( "marks" ).toString(),
+                                this->ui->comment_text->toPlainText(),
+                                    this->ui->comment_pos_combo->itemText(
+                                        this->ui->comment_pos_combo->currentIndex() ) );
         }
     }
 }
@@ -411,10 +429,10 @@ void grader_editor::setup_merge_widget(int index){
     if(this->merge_list[index].isEmpty())
         return;
 
-    this->merge_combo_box=new QComboBox(this->ui->merge_widget);
+    this->merge_combo_box=new QComboBox(this);
     this->merge_combo_box->setEditable(true);
     this->merge_combo_box->setAcceptDrops(false);
-    this->merge_combo_box->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
+    this->ui->id_merge_layout->addWidget(this->merge_combo_box);
     this->merge_combo_box->addItems(this->merge_list[index]);
     this->current_merge_index=0;
 
