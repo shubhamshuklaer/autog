@@ -49,9 +49,12 @@ QString grader_file_sys::get_marks(QString file_name,int index){
         this->sub_tex_files_edit_lock.unlock();
         QRegularExpression get_marks_pattern("\\\\putmarks{([^}]*)}");
         QRegularExpressionMatchIterator it=get_marks_pattern.globalMatch(sub_tex_content);
-        for(int i=0;i<index;i++)
+        for(int i=0;i<index && it.hasNext();i++)
             it.next();
-        marks=it.next().captured(1);
+        if(it.hasNext())
+            marks=it.next().captured(1);
+        else
+            qDebug()<<"get_marks"<<index;
     }else{
         this->sub_tex_files_edit_lock.unlock();
         emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" to read marks"));
@@ -74,8 +77,10 @@ void grader_file_sys::put_marks(QString file_name, QString marks,int index){
     replacement="\\putmarks{"+marks.simplified()+"}";
 
     QRegularExpressionMatchIterator it=pattern.globalMatch(content);
-    for(int i=0;i<index;i++)
+    for(int i=0;i<index&&it.hasNext();i++)
         it.next();
+    if(!it.hasNext())
+        qDebug()<<"put_marks"<<index;
     QRegularExpressionMatch match=it.next();
     int match_start,match_length;
     match_start=match.capturedStart(0);
@@ -111,8 +116,10 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     replacement="\\putcomment"+comment_pos+"{"+comment+"}\\nextcommandmarker";
 
     QRegularExpressionMatchIterator it=pattern.globalMatch(content);
-    for(int i=0;i<index;i++)
+    for(int i=0;i<index&&it.hasNext();i++)
         it.next();
+    if(!it.hasNext())
+        qDebug()<<"put_comment"<<index;
     QRegularExpressionMatch match=it.next();
     int match_start,match_length;
     match_start=match.capturedStart(0);
@@ -147,8 +154,10 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos,int i
     pattern=QRegularExpression("\\\\putcomment"+comment_pos+"{(((?!}\\\\nextcommandmarker).)*)}\\\\nextcommandmarker",QRegularExpression::DotMatchesEverythingOption);
 
     QRegularExpressionMatchIterator it=pattern.globalMatch(content);
-    for(int i=0;i<index;i++)
+    for(int i=0;i<index&&it.hasNext();i++)
         it.next();
+    if(!it.hasNext())
+        qDebug()<<"get_comment"<<index;
     return it.next().captured(1);
 }
 

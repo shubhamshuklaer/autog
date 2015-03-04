@@ -69,10 +69,11 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
                                   this, SLOT( display_errors_slot( QString ) ) );
     this->file_sys_thread->start();
 
-    setup_marks_widget(this->current_index);
     this->merge_combo_box=NULL;
     this->current_merge_index=0;
     setup_merge_widget(this->current_index);
+    setup_marks_widget(this->current_index);
+
 
     this->ui->comment_text->setText(this->file_sys_interface->get_comment(
                                     this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),get_merge_index() ) );
@@ -132,8 +133,8 @@ void grader_editor::on_next_btn_clicked()
         this->ui->prev_btn->setEnabled(true);
         this->current_index++;
         this->ui->file_name_combo->setCurrentIndex(this->current_index);
-        setup_marks_widget(this->current_index);
         setup_merge_widget(this->current_index);
+        setup_marks_widget(this->current_index);
         this->ui->comment_pos_combo->setCurrentIndex(0);
         this->previous_comment_pos_index=0;
         this->ui->comment_text->setText(this->file_sys_interface->
@@ -159,8 +160,8 @@ void grader_editor::on_prev_btn_clicked()
         this->ui->next_btn->setEnabled(true);
         this->current_index--;
         this->ui->file_name_combo->setCurrentIndex(this->current_index);
-        setup_marks_widget(this->current_index);
         setup_merge_widget(this->current_index);
+        setup_marks_widget(this->current_index);
         this->ui->comment_pos_combo->setCurrentIndex(0);
         this->previous_comment_pos_index=0;
         this->ui->comment_text->setText(this->file_sys_interface->
@@ -209,8 +210,9 @@ void grader_editor::on_file_name_combo_activated(int index)
             else
                 this->ui->next_btn->setEnabled(true);
 
-            setup_marks_widget(this->current_index);
             setup_merge_widget(this->current_index);
+            setup_marks_widget(this->current_index);
+
 
             this->ui->comment_pos_combo->setCurrentIndex(0);
             this->previous_comment_pos_index=0;
@@ -264,7 +266,13 @@ void grader_editor::setup_marks_widget(int index){
     this->ui->marks_label->setBuddy(this->marks_widget);
 
     //setting tab order of editor widget
-    QWidget::setTabOrder( this->ui->file_name_combo, this->marks_widget );
+    if(this->merge_combo_box!=NULL){
+        QWidget::setTabOrder( this->ui->file_name_combo, this->merge_combo_box );
+        QWidget::setTabOrder( this->merge_combo_box, this->marks_widget );
+    }else{
+        QWidget::setTabOrder( this->ui->file_name_combo, this->marks_widget );
+    }
+
     QWidget::setTabOrder( this->marks_widget, this->ui->comment_pos_combo );
     QWidget::setTabOrder( this->ui->comment_pos_combo, this->ui->comment_text );
     QWidget::setTabOrder( this->ui->comment_text, this->ui->next_btn );
