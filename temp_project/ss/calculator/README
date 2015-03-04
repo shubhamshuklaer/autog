@@ -1,0 +1,140 @@
+
+The calculator and calculus packages: Use \LaTeX as a scientific calculator.
+
+Robert Fuster, 2012, 2014
+
+
+1. Licence
+----------
+This material is subject to the LaTeX Project Public License. 
+
+See http://www.ctan.org/tex-archive/help/Catalogue/licenses.lppl.html 
+for the details of that license.
+
+2. Changes in version 2.0
+-------------------------
+- Inverse trigonometric and inverse hyperbolic functions are added
+  (this completes the typical elementary functions)
+
+- Also vector (cross) product and angle between vectors can be evaluated
+
+- New length operations
+
+- ... and some other minor additions and changes
+
+3. About the packages
+---------------------
+The calculator and calculus packages define several instructions which allow us 
+to realize algebraic operations and to evaluate elementary functions 
+and derivatives in our documents.
+
+My main goal is to define the arithmetic and functional calculations I need in 
+my package "xpicture" 
+(http://ctan.org/pkg/xpicture, http://www.upv.es/~rfuster/xpicture), 
+but the numeric abilities of "calculator" and "calculus" may be useful 
+in other contexts.
+
+3.1 The calculator package
+--------------------------
+The operations implemented by the calculator package include
+- arithmetical calculations with  real and integer numbers 
+- two and three dimensional vectors and matrices arithmetics 
+- computation of powers, square roots, trigonometric, exponential, 
+  logarithmic, hyperbolic, inverse trigonometric 
+  and inverse hyperbolic functions. 
+
+In addition, some important numbers, such as pi, sqrt(2) or e, are predefined.
+
+Some simple examples:
+
+a) Simplify a fraction: if you type
+
+   \FRACTIONSIMPLIFY{252}{2220}{\num}{\den}
+
+    Then, $\num/\den$ equals to 21/186 
+
+b) Compute elementary functions:
+
+   \LOG{2}{\sol}  ---> \sol equals 0.69315
+
+   \LOG[10]{2}{\sol} ---> \sol equals 0.30103
+
+   \SIN{\numberHALFPI}{\sol} ---> \sol equals 1
+ 
+c) More complex calculations:
+   You can compute the value of sqrt(7.25)cos(pi/7) by typing
+
+   \SQRT{7.25}{\tempa}
+   \DIVIDE{\numberPI}{7}{\tempb}
+   \COS{\tempb}{\tempc}
+   \MULTIPLY{\tempa}{\tempc}{\sol}
+
+   Then, the value 2.42589 is stored in \sol.
+
+d) Vectors and matrices:
+
+   \SCALARPRODUCT(1,2)(2,1){\sol}  ---> \sol equals 4
+
+   \MATRIXPRODUCT(1,1;-1,2)(0,-1;1,1)(\sola,\solb;\solc,\sold)
+        ---> \sola, \solb, \solc, \sold equals 1, 0, 2, 3.
+
+
+3.2. The calculus package
+-------------------------
+This package adds to the calculator package several utilities to use and define
+real functions and their derivatives, including elementary functions, 
+operations with functions, vector-valuated functions polar coordinates.
+When you call a "function", this function ant its derivative are evaluated 
+simultaneously.
+
+Examples:
+
+a) Predefined functions:
+
+   \SINfunction{\numberPI}{\sol}{\Dsol} ---> 
+                     \sol equals to 0 (=sin(pi)), and \Dsol equals -1 (=cos(pi)), 
+                     because cos(t) is the derivative of sin(t).
+
+b) Defining new functions: You can define the function f(t)=exp(2t)cos(t)-t 
+with the following code:
+
+   \SCALEVARIABLEfunction{2}{\EXPfunction}{\functionA}  % A=e^(2t)
+   \MULTIPLY{\functionA}{\COSfunction}{\functionB}      % b=e^(2t)cos(t)
+   \SUBTRACTfunction{\functionB}{\IDENTITYfunction}{\functionF} % My function
+
+Then, \functionF{num}{\sol}{\Dsol} stores f(num) and f'(num) in \sol and \Dsol. 
+
+
+4. Installation and documentation
+---------------------------------
+1. Compile the installation file "calculator.ins",
+
+     >> latex calculator.ins
+
+   to generate the two essential files,
+
+      "calculator.sty" and "calculus.sty".
+     
+       Move these two files where LaTeX  search for 
+       (typically, in a local texmf tree, at tex/latex/calculator) 
+       and refresh the file database.
+
+2. To have the documentation and user's manual, "calculator.pdf",
+   compile the source file "calculator.dtx" in the following sequence:
+
+     >> pdflatex calculator.dtx
+     >> makeindex -s gind.ist -o calculator.ind calculator.idx
+     >> makeindex -s gglo.ist -o calculator.gls calculator.glo
+     >> pdflatex calculator.dtx
+     >> pdflatex calculator.dtx
+
+In addition, many small files, named "calculatorNN.tex" are generated.
+These files contain the source code of all examples included in the manual.
+You can store or discard this files.
+
+---------------------------------------------------------------
+Robert Fuster
+rfuster@mat.upv.es
+
+Universitat Polit\`ecnica de Val\`encia, 2012/05/19, 2014/02/23
+---------------------------------------------------------------

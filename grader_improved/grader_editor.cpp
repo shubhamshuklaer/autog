@@ -252,6 +252,8 @@ void grader_editor::on_see_errors_btn_clicked()
 
 
 void grader_editor::setup_marks_widget(int index){
+    //The tab order is set up in setup_marks_widget only cause every time
+    //after setup_merge_widget is called this function is called too.
     if(this->marks_widget!=NULL)
         delete this->marks_widget;
 

@@ -1,0 +1,173 @@
+
+\documentclass{article}
+\usepackage{ocgx}
+\usepackage{ifthen}
+\newlength{\scanwidth}
+\newlength{\panewidth}
+\newlength{\autogtotalwidth}
+\newlength{\reducedwidth}
+\newlength{\autogmargin}
+\setlength{\autogmargin}{2mm}
+\setlength{\scanwidth}{210mm}
+\setlength{\panewidth}{80mm}
+\setlength{\fboxsep}{2mm}
+\setlength{\parindent}{0mm}
+\newcommand{\numofpanes}{2}
+\usepackage{calculator}
+\LENGTHADD{1.005\scanwidth}{\numofpanes\panewidth}{\autogtotalwidth}
+\LENGTHADD{\autogtotalwidth}{2\autogmargin}{\autogtotalwidth}
+\usepackage[	paperheight=297mm,
+			paperwidth=\autogtotalwidth,
+			margin=\autogmargin
+			]{geometry}	
+\pagestyle{empty}
+\usepackage{color}
+
+\usepackage[absolute]{textpos}	%,showboxes
+\TPMargin{0pt}
+\usepackage[]{graphicx}
+\newcommand{\scansdir}{.}%./../../scans}
+\newcommand{\showscan}[1]{
+		\begin{textblock*}{\scanwidth}(\autogmargin,\autogmargin)
+		\resizebox{\scanwidth}{!}{
+			\fbox{\includegraphics[]{\scansdir/page-#1.pdf}}
+			}
+		\end{textblock*}
+}
+\newlength{\vslider}
+\newlength{\hslider}
+\newcommand{\putinpane}[1]{
+	\begin{textblock*}{\panewidth}(\hslider,\vslider) 
+			#1	
+	\end{textblock*}
+	}
+\newcommand{\formatpageid}[1]{
+	\framebox{PageID: \textbf{\textcolor{blue}{\LARGE #1}}}
+	}
+\newcommand{\formatmarkingscheme}[1]{
+	\framebox{MarkingScheme: \textbf{\textcolor{blue}{\large #1}}}
+	}
+\newcommand{\formatmarks}[1]{
+	\framebox{PageMark: \textbf{\textcolor{red}{\Large #1}}}
+	}
+\newcommand{\formatcomment}[1]{
+	\begin{minipage}{0.95\panewidth}
+		\textbf{\textcolor{red}{\large #1}}
+	\end{minipage}
+	}
+\newcommand{\showpageid}[1]{
+	\setlength{\vslider}{\autogmargin}
+	\putinpane{\formatpageid{#1}}
+	}	
+\newcommand{\showmarkingscheme}[1]{
+	\setlength{\vslider}{12mm}
+	\putinpane{\formatmarkingscheme{#1}}
+	}
+
+\newcommand{\putmarks}[1]{
+	\setlength{\vslider}{21mm}
+	\putinpane{\formatmarks{#1}}
+	}
+	\newcommand{\putcommentT}[1]{
+			\setlength{\vslider}{50mm}
+			\putinpane{\formatcomment{#1}}
+			}
+	\newcommand{\putcommentM}[1]{
+			\setlength{\vslider}{150mm}
+			\putinpane{\formatcomment{#1}}
+			}
+	\newcommand{\putcommentB}[1]{
+			\setlength{\vslider}{220mm}
+			\putinpane{\formatcomment{#1}}
+			}
+	\newcommand{\putcommentC}[1]{   
+			#1
+			}
+			
+
+\newcommand{\optionalgroup}{graders1}
+\newcommand{\showgroup}{1}
+\newcommand{\wrapocg}[1]{
+	\begin{ocg}{OCG1}{\optionalgroup}{0} %Everthing hidden at start \showgroup}
+	#1
+	\end{ocg}
+	}
+
+
+\newcommand{\setpanenumber}[1]{\SUBTRACT{#1}{1}{\thispane}
+								\LENGTHADD{1.005\scanwidth}{\thispane\panewidth}{\hslider}
+								\LENGTHADD{\hslider}{\autogmargin}{\hslider}
+	}
+	
+\newcommand{\setgraders}[1]{\renewcommand{\optionalgroup}{#1}\ifthenelse{\equal{#1}{graders1}}{\renewcommand{\showgroup}{1}}{\renewcommand{\showgroup}{0}}}		
+			
+			
+\newcommand{\gradshowpageid}[1]{
+	\setlength{\vslider}{\autogmargin}
+	\putinpane{\wrapocg{\formatpageid{#1}}}
+	}	
+\newcommand{\gradshowmarkingscheme}[1]{
+	\setlength{\vslider}{12mm}
+	\putinpane{\wrapocg{\formatmarkingscheme{#1}}}
+	}
+
+\newcommand{\gradputmarks}[1]{
+	\setlength{\vslider}{21mm}
+	\putinpane{\wrapocg{\formatmarks{#1}}}
+	}
+
+\newcommand{\gradputcommentT}[1]{
+			\setlength{\vslider}{50mm}
+			\putinpane{\wrapocg{\formatcomment{#1}}}
+			}
+	\newcommand{\gradputcommentM}[1]{
+			\setlength{\vslider}{150mm}
+			\putinpane{\wrapocg{\formatcomment{#1}}}
+			}
+	\newcommand{\gradputcommentB}[1]{
+			\setlength{\vslider}{220mm}
+			\putinpane{\wrapocg{\formatcomment{#1}}}
+			}
+	\newcommand{\gradputcommentC}[1]{
+			\wrapocg{#1}
+			}
+\newcommand{\nextcommandmarker}{}
+\newcommand{\hidenseekbuttons}{
+	\begin{textblock*}{\panewidth}(\hslider,40mm)
+		\switchocg{graders1 graders2}{Toggle}
+		\actionsocg{}{graders2}{graders1}{Swap}
+		\hideocg{graders1 graders2}{Hide}
+	\end{textblock*}
+	}
+	
+	
+\begin{document}
+%
+\setpanenumber{1}
+%%%%%%%%%%%%:007-05:Start:WHICHGRADER:KeyAndPageNumber
+	\showscan{007-05}	
+	\showpageid{007-05}		
+	\showmarkingscheme{1+1+1+2}		
+	\putcommentT{BlankPage}\nextcommandmarker			%%:topcomment:007-05:
+	\putcommentM{abc1}\nextcommandmarker												
+	\putcommentB{terrible job }\nextcommandmarker																							
+	\putcommentC{}\nextcommandmarker																					
+	\putmarks{0.5}\nextcommandmarker			 %%:putmarks:007-05:
+	%\newpage
+%%%%%%%%%%%%:007-05:End:WHICHGRADER:KeyAndPageNumber
+%
+%
+\setpanenumber{2}
+%%%%%%%%%%%%:007-05:Start:WHICHGRADER:KeyAndPageNumber
+	%\showscan{007-05}	
+	\showpageid{007-05}		
+	\showmarkingscheme{1+1+1+2}		
+	\putcommentT{BlankPage}\nextcommandmarker			%%:topcomment:007-05:
+	\putcommentM{pqr2}\nextcommandmarker												
+	\putcommentB{good job }\nextcommandmarker																							
+	\putcommentC{}\nextcommandmarker																					
+	\putmarks{1+1+1+0}\nextcommandmarker			 %%:putmarks:007-05:
+	\newpage
+%%%%%%%%%%%%:007-05:End:WHICHGRADER:KeyAndPageNumber
+%
+\end{document}

@@ -1,0 +1,97 @@
+\documentclass[12pt]{article}
+
+
+\usepackage[	paperheight=302mm,
+			paperwidth=312mm,
+			margin=2mm
+			]{geometry}	%paperheight=304mm=297+3+3+1;paperwidth=3+(210+1)+90+1+3
+			
+\usepackage{amssymb}
+
+
+\usepackage{graphicx}
+\usepackage{color}
+
+\usepackage{ifthen}
+\usepackage[absolute]{textpos}			% for positioning text!!!!!!!
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}			% MUST......
+\TPMargin{0pt}
+
+\setlength{\fboxsep}{1pt}
+\setlength{\fboxrule}{0.1pt}
+
+\pagestyle{empty}
+\definecolor{markscolor}{rgb}{0.1,0.1,1}
+\setlength{\unitlength}{1mm}
+\setlength{\parindent}{0mm}
+
+%bursts directory of files to be annotated: pdf in A4 size
+\newcommand{\scansdir}{../../../scans}
+
+\newcommand{\showscan}[1]{
+		\fbox{\includegraphics[width=210mm]{\scansdir/page-#1.pdf}}
+	}
+	
+\newcommand{\showpageid}[1]{
+	\begin{textblock}{20}(213,2) 
+		\fboxsep=2mm
+		\framebox{PageID: \textbf{\textcolor{markscolor}{\LARGE #1}}}
+	\end{textblock}
+	}
+
+\newcommand{\vslider}{34}
+\newcommand{\putcomment}[2][t]{
+		\ifthenelse{\equal{#1}{t}}
+			{\renewcommand{\vslider}{34}}
+			{\ifthenelse{\equal{#1}{m}}
+				{\renewcommand{\vslider}{120}}
+				{\renewcommand{\vslider}{220}}
+			}
+		\begin{textblock}{90}(216,\vslider)
+			\begin{minipage}{90mm}
+				\textbf{\textcolor{red}{\large #2}}
+			\end{minipage}
+		\end{textblock}
+	}
+
+	\newcommand{\putcommentT}[1]{
+			\putcomment[t]{#1}
+			}
+	\newcommand{\putcommentM}[1]{
+			\putcomment[m]{#1}
+			}
+	\newcommand{\putcommentB}[1]{
+			\putcomment[b]{#1}
+			}
+	\newcommand{\putcommentC}[1]{   
+			#1
+			}
+\newcommand{\putmarks}[1]{
+	\begin{textblock}{90}(213,21) 
+			\fboxsep=2mm
+			\framebox{PageMark: \textbf{\textcolor{red}{\Large #1}}}
+	\end{textblock}
+	}
+
+\newcommand{\showmarkingscheme}[1]{
+	\begin{textblock}{90}(213,12) 
+			\fboxsep=2mm
+			\framebox{MarkingScheme: \textbf{\textcolor{markscolor}{\large #1}}}
+	\end{textblock}
+
+}
+
+\begin{document} 
+%
+%%%%%%%%%%%%:007-09:Start:KeyAndPageNumber
+	\showscan{007-09}	\showpageid{007-09}		\showmarkingscheme{0.5+1.5+2}		%%Match this ID!!
+	\putcommentT{BlankPage}			%%topcomment:007-09
+	\putcommentM{}												
+	\putcommentB{}											
+	\putcommentC{}										
+	\putmarks{0}
+	\newpage
+%%%%%%%%%%%%:007-09:End:KeyAndPageNumber
+%
+\end{document}
