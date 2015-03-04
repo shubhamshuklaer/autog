@@ -142,7 +142,7 @@ void grader_editor::on_next_btn_clicked()
                                       this->files_list[this->current_index],
                                                                         this->ui->comment_pos_combo->itemText(0),get_merge_index()) );
 
-        generate_pdf( false, this->files_list[this->current_index],
+        generate_pdf( true, this->files_list[this->current_index],
                 this->marks_widget->property( "marks" ).toString(),
                             this->ui->comment_text->toPlainText(),
                                 this->ui->comment_pos_combo->itemText(
@@ -175,7 +175,7 @@ void grader_editor::on_prev_btn_clicked()
                                       this->files_list[this->current_index],
                                                                         this->ui->comment_pos_combo->itemText(0),get_merge_index()) );
 
-        generate_pdf( false, this->files_list[this->current_index],
+        generate_pdf( true, this->files_list[this->current_index],
                 this->marks_widget->property( "marks" ).toString(),
                             this->ui->comment_text->toPlainText(),
                                 this->ui->comment_pos_combo->itemText(
@@ -232,7 +232,7 @@ void grader_editor::on_file_name_combo_activated(int index)
             this->ui->comment_text->setText( this->file_sys_interface->get_comment(
                                        this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),get_merge_index() ) );
 
-            generate_pdf( false, this->files_list[this->current_index],
+            generate_pdf( true, this->files_list[this->current_index],
                     this->marks_widget->property( "marks" ).toString(),
                                 this->ui->comment_text->toPlainText(),
                                     this->ui->comment_pos_combo->itemText(
@@ -244,18 +244,19 @@ void grader_editor::on_file_name_combo_activated(int index)
 
 void grader_editor::on_merge_combo_activated(int index){
     if(index!=this->current_merge_index){
-        generate_pdf( false, this->files_list[this->current_index],
-                this->marks_widget->property( "marks" ).toString(),
-                            this->ui->comment_text->toPlainText(),
-                                this->ui->comment_pos_combo->itemText(
-                                    this->ui->comment_pos_combo->currentIndex() ) );
+        put_comment( false, this->files_list[this->current_index],
+                        this->ui->comment_text->toPlainText(),
+                                    this->ui->comment_pos_combo->itemText(
+                                                this->ui->comment_pos_combo->currentIndex() ) );
+
+        put_marks(false, this->files_list[this->current_index],
+                                            this->marks_widget->property( "marks" ).toString());
         this->current_merge_index=index;
         setup_marks_widget(this->current_index);
-        this->ui->comment_pos_combo->setCurrentIndex(0);
-        this->previous_comment_pos_index=0;
 
         this->ui->comment_text->setText( this->file_sys_interface->get_comment(
-                                   this->files_list[this->current_index], this->ui->comment_pos_combo->itemText(0),get_merge_index() ) );
+                                   this->files_list[this->current_index],
+            this->ui->comment_pos_combo->itemText(this->previous_comment_pos_index),get_merge_index() ) );
 
     }
 }
@@ -346,6 +347,29 @@ void grader_editor::on_comment_pos_combo_activated(int index)
 
 
 
+
+void grader_editor::put_marks( bool async, QString file_name ,QString marks ){
+    int index=get_merge_index();
+    if(async){
+        //Asynchronous function call
+        //the call is posted as a event the the file sys interface thread
+        QByteArray normalizedSignature = QMetaObject::normalizedSignature(
+                                                "put_marks( QString, QString, int )" );
+        int method_index=this->file_sys_interface->metaObject()->
+                                                  indexOfMethod(normalizedSignature);
+        QMetaMethod method=this->file_sys_interface->metaObject()->
+                                                                method(method_index);
+        method.invoke( this->file_sys_interface, Qt::QueuedConnection,
+                            Q_ARG( QString, file_name ), Q_ARG( QString, marks )
+                                                     , Q_ARG( int, index ) );
+    }else{
+        this->file_sys_interface->put_marks(file_name,marks,index);
+    }
+}
+
+
+
+
 void grader_editor::put_comment( bool async, QString file_name ,
                                         QString comment , QString comment_pos ){
     int index=get_merge_index();
@@ -353,7 +377,7 @@ void grader_editor::put_comment( bool async, QString file_name ,
         //Asynchronous function call
         //the call is posted as a event the the file sys interface thread
         QByteArray normalizedSignature = QMetaObject::normalizedSignature(
-                                                "put_comment( QString, QString )" );
+                                                "put_comment( QString, QString, QString, int )" );
         int method_index=this->file_sys_interface->metaObject()->
                                                   indexOfMethod(normalizedSignature);
         QMetaMethod method=this->file_sys_interface->metaObject()->

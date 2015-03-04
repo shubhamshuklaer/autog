@@ -31,6 +31,7 @@ public:
     QMutex tex_compile_errors_lock;
     QComboBox *merge_combo_box;
     void put_comment(bool async,QString file_name , QString comment,QString comment_pos);
+    void put_marks( bool async, QString file_name ,QString marks );
     void generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos);
 
 private slots:

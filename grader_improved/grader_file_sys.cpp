@@ -94,7 +94,7 @@ void grader_file_sys::put_marks(QString file_name, QString marks,int index){
     }
     QTextStream input1(&file);
     input1<<content;
-    file.flush();
+    input1.flush();
     file.close();
     this->sub_tex_files_edit_lock.unlock();
 }
@@ -134,7 +134,7 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     }
     QTextStream input1(&file);
     input1<<content;
-    file.flush();
+    input1.flush();
     file.close();
     this->sub_tex_files_edit_lock.unlock();
 }
