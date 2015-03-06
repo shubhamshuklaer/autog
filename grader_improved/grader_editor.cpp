@@ -58,6 +58,8 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->ui->file_name_combo->setMinimumWidth(width);
     this->ui->marks_widget->setLayout(new QHBoxLayout(this->ui->marks_widget));
     this->ui->marks_widget->layout()->setContentsMargins(0,0,0,0);
+    set_combobox_completer(this->ui->file_name_combo);
+    set_combobox_completer(this->ui->comment_pos_combo);
 
 
     this->file_sys_thread= new QThread(this);
@@ -397,6 +399,8 @@ void grader_editor::load_page(bool start,int index){
             else
                 this->ui->next_btn->setEnabled(true);
 
+            this->ui->file_name_combo->setCurrentIndex(this->current_index);
+
             load_page_meta_data();
             setup_merge_widget();
             setup_marks_widget();
@@ -452,12 +456,11 @@ void grader_editor::load_page_meta_data(){
 
     QRegularExpressionMatchIterator it=merge_pattern.globalMatch(tex_file_content);
 
-    QStringList temp_merge_list;
+    this->current_merge_list.clear();
 
     while(it.hasNext()){
         QRegularExpressionMatch merge_pattern_match=it.next();
-        temp_merge_list<<merge_pattern_match.captured(1);
+        this->current_merge_list<<merge_pattern_match.captured(1);
     }
 
-    this->current_merge_list<<temp_merge_list;
 }
