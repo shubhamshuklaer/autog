@@ -25,8 +25,7 @@ private:
     grader_editor *editor_widget;
     grader_project_load *project_load_widget;
     QString project_path,module_name;
-    QStringList files_list,marks_denominations_list;
-    QList<QStringList> merge_list;
+    QStringList files_list;
     int start_grading_from;
 };
 

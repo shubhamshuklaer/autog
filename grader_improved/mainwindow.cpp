@@ -71,17 +71,12 @@ void MainWindow::setup_done(){
     this->project_path=this->project_load_widget->property("project_path").toString();
     this->module_name=this->project_load_widget->property("module_name").toString();
     this->files_list=this->project_load_widget->property("files_list").toStringList();
-    this->marks_denominations_list=this->project_load_widget->property(
-                "marks_denominations_list").toStringList();
-    this->merge_list=this->project_load_widget->property("merge_list").value<QList<QStringList> >();
     this->start_grading_from=this->project_load_widget->property(
                                                         "start_grading_from").toInt();
     delete this->project_load_widget;
     this->setWindowTitle(this->module_name);
     this->editor_widget=new grader_editor(this,this->project_path,this->module_name,
-                                          this->files_list,
-                                          this->marks_denominations_list,this->merge_list,
-                                                            this->start_grading_from);
+                                          this->files_list, this->start_grading_from);
     this->editor_widget->show();
     this->setMinimumSize(this->editor_widget->size());
     this->resize(this->editor_widget->size());

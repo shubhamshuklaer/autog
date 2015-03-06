@@ -39,8 +39,7 @@
 
 grader_editor::grader_editor( QWidget *parent, QString project_path,
                               QString module_name, QStringList files_list,
-                                        QStringList marks_denominations_list,
-                              QList<QStringList> merge_list,int start_grading_from ) :
+                                                    int start_grading_from ) :
     QWidget(parent),
     ui(new Ui::grader_editor)
 {
@@ -49,8 +48,6 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->project_path=project_path;
     this->module_name=module_name;
     this->files_list=files_list;
-    this->marks_denominations_list=marks_denominations_list;
-    this->merge_list=merge_list;
     this->current_index=start_grading_from;
     this->module_dir_path=project_path+"/"+module_name;
 
@@ -152,7 +149,7 @@ void grader_editor::setup_marks_widget(){
         delete this->marks_widget;
 
     this->marks_widget=new grader_marks_widget( this->ui->marks_widget,
-                                        this->marks_denominations_list[this->current_index].split(
+                                        this->current_marking_scheme.split(
                                                     marks_denominations_delemiter ) );
     this->marks_widget->setProperty("marks",get_marks() );
     this->ui->marks_widget->layout()->addWidget(this->marks_widget);
@@ -331,13 +328,13 @@ void grader_editor::setup_merge_widget(){
         this->current_merge_index=0;
     }
 
-    if(this->merge_list[this->current_index].isEmpty())
+    if(this->current_merge_list.isEmpty())
         return;
 
     this->merge_combo_box=new QComboBox(this);
     this->merge_combo_box->setEditable(true);
     this->merge_combo_box->setAcceptDrops(false);
-    this->merge_combo_box->addItems(this->merge_list[this->current_index]);
+    this->merge_combo_box->addItems(this->current_merge_list);
     this->merge_combo_box->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed);
     int width = this->merge_combo_box->minimumSizeHint().width();//width of largest item
     this->merge_combo_box->setMinimumWidth(width);
@@ -400,6 +397,7 @@ void grader_editor::load_page(bool start,int index){
             else
                 this->ui->next_btn->setEnabled(true);
 
+            load_page_meta_data();
             setup_merge_widget();
             setup_marks_widget();
 
@@ -426,4 +424,40 @@ QString grader_editor::get_marks(){
 
 }
 
+void grader_editor::load_page_meta_data(){
+    QFile tex_file( this->module_dir_path + "/" + this->files_list[this->current_index] + ".tex" );
 
+
+    if(!tex_file.open( QIODevice::ReadOnly | QIODevice::Text ) ){
+        display_error( tr( "couldn't open file " ) + this->module_dir_path + "/" +
+                            this->files_list[this->current_index] + ".tex" +
+                                tr( " for reading page metadata data" ) );
+        this->current_marking_scheme="";
+        this->current_merge_list=QStringList();
+        return;
+    }
+
+    QTextStream tex_input_stream(&tex_file);
+    QString tex_file_content=tex_input_stream.readAll();
+    tex_file.close();
+
+    QRegularExpression marking_scheme_pattern(
+       "\\\\showmarkingscheme{([0-9\\." + QString(
+                                  marks_denominations_delemiter ) + "]*)}" );
+    this->current_marking_scheme = marking_scheme_pattern.match(
+                                                tex_file_content).captured(1);
+
+
+    QRegularExpression merge_pattern(const_merge_pattern);
+
+    QRegularExpressionMatchIterator it=merge_pattern.globalMatch(tex_file_content);
+
+    QStringList temp_merge_list;
+
+    while(it.hasNext()){
+        QRegularExpressionMatch merge_pattern_match=it.next();
+        temp_merge_list<<merge_pattern_match.captured(1);
+    }
+
+    this->current_merge_list<<temp_merge_list;
+}

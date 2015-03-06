@@ -13,8 +13,6 @@ class grader_project_load : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(QStringList files_list READ get_files_list)
-    Q_PROPERTY(QStringList marks_denominations_list READ get_marks_denominations_list)
-    Q_PROPERTY(QList<QStringList> merge_list READ get_merge_list)
     Q_PROPERTY(QString module_name READ get_module_name)
     Q_PROPERTY(QString project_path READ get_project_path)
     Q_PROPERTY(int start_grading_from READ get_grading_start)

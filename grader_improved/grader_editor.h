@@ -19,13 +19,12 @@ class grader_editor : public QWidget
     Q_OBJECT
 
 public:
-    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),QList<QStringList> merge_list=QList<QStringList>(),int start_grading_from=0);
+    explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),int start_grading_from=0);
     ~grader_editor();
     int current_index,current_merge_index;
     int current_comment_pos_index;
-    QString project_path,module_name,module_dir_path,tex_compile_errors;
-    QStringList files_list,marks_denominations_list;
-    QList<QStringList> merge_list;
+    QString project_path,module_name,module_dir_path,tex_compile_errors,current_marking_scheme;
+    QStringList files_list,current_merge_list;
     grader_marks_widget *marks_widget;
     grader_file_sys *file_sys_interface;
     QThread *file_sys_thread;
@@ -69,6 +68,7 @@ private:
     void load_page(bool start,int index);
     int get_merge_index();
     void display_error(QString);
+    void load_page_meta_data();
     QString get_comment();
     QString get_marks();
 

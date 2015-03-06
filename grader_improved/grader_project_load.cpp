@@ -160,15 +160,6 @@ QStringList grader_project_load::get_files_list(){
     return this->files_list;
 }
 
-
-QStringList grader_project_load::get_marks_denominations_list(){
-    return this->marks_denominations_list;
-}
-
-QList<QStringList> grader_project_load::get_merge_list(){
-    return this->merge_list;
-}
-
 void grader_project_load::load_settings(){
     QFile settings_file(this->project_path+"/"+settings_file_name);
     QDir project_dir(this->project_path);
@@ -312,29 +303,9 @@ bool grader_project_load::setup_module(){
         QString tex_file_content=tex_input_stream.readAll();
         tex_file.close();
 
-        QRegularExpression marking_scheme_pattern(
-           "\\\\showmarkingscheme{([0-9\\." + QString(
-                                      marks_denominations_delemiter ) + "]*)}" );
-        this->marks_denominations_list << marking_scheme_pattern.match(
-                                                    tex_file_content).captured(1);
-
-
-        QRegularExpression merge_pattern(const_merge_pattern);
-
-        QRegularExpressionMatchIterator it=merge_pattern.globalMatch(tex_file_content);
-
-        QStringList temp_merge_list;
-
-        while(it.hasNext()){
-            QRegularExpressionMatch merge_pattern_match=it.next();
-            temp_merge_list<<merge_pattern_match.captured(1);
-        }
-
-        this->merge_list<<temp_merge_list;
-
         if( !got_grading_start ){
             QRegularExpression put_marks_pattern("\\\\putmarks{(.*)}");
-            if( put_marks_pattern.match( tex_file_content ).captured(1) == NULL ){
+            if( put_marks_pattern.match( tex_file_content ).captured(1) == "" ){
                 got_grading_start=true;
             }
             start_grading_from++;
