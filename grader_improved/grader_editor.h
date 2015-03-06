@@ -22,7 +22,7 @@ public:
     explicit grader_editor(QWidget *parent = 0,QString project_path=QString(),QString module_name=QString(),QStringList files_list=QStringList(),QStringList marks_denominations_list=QStringList(),QList<QStringList> merge_list=QList<QStringList>(),int start_grading_from=0);
     ~grader_editor();
     int current_index,current_merge_index;
-    int previous_comment_pos_index;
+    int current_comment_pos_index;
     QString project_path,module_name,module_dir_path,tex_compile_errors;
     QStringList files_list,marks_denominations_list;
     QList<QStringList> merge_list;
@@ -32,9 +32,9 @@ public:
     QMutex tex_compile_errors_lock;
     QComboBox *merge_combo_box;
     QLabel *merge_label;
-    void put_comment(bool async,QString file_name , QString comment,QString comment_pos);
-    void put_marks( bool async, QString file_name ,QString marks );
-    void generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos);
+    void put_comment(bool async);
+    void put_marks(bool async);
+    void generate_pdf(bool async);
 
 private slots:
     void on_next_btn_clicked();
@@ -63,10 +63,14 @@ public slots:
     void display_errors_slot(QString);
 private:
     Ui::grader_editor *ui;
-    void setup_marks_widget(int index);
-    void setup_merge_widget(int index);
+    void setup_marks_widget();
+    void setup_merge_widget();
+    void set_combobox_completer(QComboBox *);
+    void load_page(bool start,int index);
     int get_merge_index();
     void display_error(QString);
+    QString get_comment();
+    QString get_marks();
 
 
 
