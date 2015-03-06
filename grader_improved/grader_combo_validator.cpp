@@ -48,7 +48,7 @@ QValidator::State grader_combo_validator::validate(QString &input_text, int &pos
         if( item_text == input_text )
             acceptable=true;
         else{
-            if( item_text.indexOf(input_text,0,Qt::CaseInsensitive) != -1 )
+            if( item_text.contains(input_text,Qt::CaseInsensitive) )
                 intermediate=true;
         }
         current_item_num++;
@@ -74,14 +74,12 @@ void grader_combo_validator::fixup(QString &input_text) const{
     current_item_num=0;
     num_items=this->data_model->rowCount();
 
+
     while( current_item_num<num_items && !done ){
         item_index=this->data_model->index(current_item_num,0);
         item_text=this->data_model->data(item_index).toString();
-        item_text.truncate(input_text.length());
-        if( item_text.indexOf(input_text,0,Qt::CaseInsensitive) != -1 ){
+        if( item_text.contains(input_text,Qt::CaseInsensitive) ){
             input_text=this->data_model->data(item_index).toString();
-            qDebug() << "Done";
-            qDebug() << input_text;
             done=true;
         }
         current_item_num++;
