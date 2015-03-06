@@ -18,6 +18,7 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QLayout>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -54,7 +55,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->project_load_widget=new grader_project_load(this);
-    this->ui->centralWidget->setFixedSize(this->project_load_widget->size());
+    this->setCentralWidget(this->project_load_widget);
+    this->setMinimumSize(this->project_load_widget->size());
+    this->resize(this->project_load_widget->size());
     connect( this->project_load_widget, SIGNAL(done()),this,SLOT(setup_done()));
     this->setStyleSheet(btn_stylesheet);
 }
@@ -80,7 +83,8 @@ void MainWindow::setup_done(){
                                           this->marks_denominations_list,this->merge_list,
                                                             this->start_grading_from);
     this->editor_widget->show();
-    this->setFixedWidth(this->editor_widget->size().width());
-    this->setFixedHeight(this->editor_widget->size().height());
+    this->setMinimumSize(this->editor_widget->size());
+    this->resize(this->editor_widget->size());
+    this->setCentralWidget(this->editor_widget);
 }
 

@@ -6,20 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>401</width>
-    <height>176</height>
+    <width>411</width>
+    <height>201</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="maximumSize">
+  <property name="minimumSize">
    <size>
     <width>401</width>
     <height>176</height>
+   </size>
+  </property>
+  <property name="sizeIncrement">
+   <size>
+    <width>1</width>
+    <height>1</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -27,19 +33,22 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>1</number>
+    <number>4</number>
    </property>
    <property name="topMargin">
-    <number>1</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>1</number>
+    <number>4</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>4</number>
    </property>
-   <property name="spacing">
-    <number>1</number>
+   <property name="horizontalSpacing">
+    <number>2</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>4</number>
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
@@ -105,7 +114,7 @@
    <item row="1" column="1">
     <widget class="QWidget" name="marks_widget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -142,6 +151,12 @@
    </item>
    <item row="2" column="1" rowspan="3">
     <widget class="QTextEdit" name="comment_text">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="tabChangesFocus">
       <bool>true</bool>
      </property>
@@ -152,6 +167,12 @@
    </item>
    <item row="3" column="0">
     <widget class="QComboBox" name="comment_pos_combo">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="editable">
       <bool>true</bool>
      </property>
@@ -184,6 +205,12 @@
     <widget class="QPushButton" name="see_errors_btn">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="focusPolicy">
       <enum>Qt::TabFocus</enum>

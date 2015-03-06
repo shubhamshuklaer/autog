@@ -27,6 +27,7 @@
 #include <QProcess>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <QHBoxLayout>
 
 #include "constants.h"
 #include "grader_combo_validator.h"
@@ -71,6 +72,8 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
 
     this->merge_combo_box=NULL;
     this->current_merge_index=0;
+    this->ui->marks_widget->setLayout(new QHBoxLayout(this->ui->marks_widget));
+    this->ui->marks_widget->layout()->setContentsMargins(0,0,0,0);
     setup_merge_widget(this->current_index);
     setup_marks_widget(this->current_index);
 
@@ -281,7 +284,8 @@ void grader_editor::setup_marks_widget(int index){
                                                     marks_denominations_delemiter ) );
     this->marks_widget->setProperty("marks",this->file_sys_interface->get_marks(
                                                           this->files_list[index],get_merge_index() ) );
-    this->marks_widget->setFixedSize(this->ui->marks_widget->size());
+    this->ui->marks_widget->layout()->addWidget(this->marks_widget);
+    //    this->marks_widget->setFixedSize(this->ui->marks_widget->size());
     connect( this->marks_widget, SIGNAL( marks_changed() ), this, SLOT(
                                                       on_marks_text_textChanged() ) );
     this->ui->marks_label->setBuddy(this->marks_widget);
@@ -446,6 +450,7 @@ void grader_editor::display_error( QString error ){
 void grader_editor::setup_merge_widget(int index){
     if(this->merge_combo_box!=NULL){
         delete this->merge_combo_box;
+        delete this->merge_label;
         this->merge_combo_box=NULL;
         this->current_merge_index=0;
     }
@@ -456,8 +461,8 @@ void grader_editor::setup_merge_widget(int index){
     this->merge_combo_box=new QComboBox(this);
     this->merge_combo_box->setEditable(true);
     this->merge_combo_box->setAcceptDrops(false);
-    this->ui->id_merge_layout->addWidget(this->merge_combo_box);
     this->merge_combo_box->addItems(this->merge_list[index]);
+    this->merge_combo_box->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed);
     this->current_merge_index=0;
 
     QCompleter * completer=new QCompleter(this->merge_combo_box);
@@ -472,6 +477,14 @@ void grader_editor::setup_merge_widget(int index){
 
     connect( this->merge_combo_box, SIGNAL( activated(int) ), this, SLOT(
                                                       on_merge_combo_activated(int) ) );
+
+
+    this->merge_label=new QLabel(this);
+    this->merge_label->setText("P&ane");
+    this->merge_label->setBuddy(this->merge_combo_box);
+
+    this->ui->id_merge_layout->addWidget(this->merge_label);
+    this->ui->id_merge_layout->addWidget(this->merge_combo_box);
     this->merge_combo_box->show();
 
 

@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QList>
 #include <QComboBox>
+#include <QLabel>
 
 namespace Ui {
 class grader_editor;
@@ -30,6 +31,7 @@ public:
     QThread *file_sys_thread;
     QMutex tex_compile_errors_lock;
     QComboBox *merge_combo_box;
+    QLabel *merge_label;
     void put_comment(bool async,QString file_name , QString comment,QString comment_pos);
     void put_marks( bool async, QString file_name ,QString marks );
     void generate_pdf(bool async,QString file_name,QString marks,QString comment_text,QString comment_pos);
