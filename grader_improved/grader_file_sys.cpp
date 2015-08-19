@@ -39,22 +39,22 @@ grader_file_sys::grader_file_sys(QObject *parent,QString module_dir_path) :
 
 
 QString grader_file_sys::get_marks(QString file_name,int index){
-    QFile sub_tex_file(this->module_dir_path+"/"+file_name+".tex");
+    QFile file(this->module_dir_path+"/"+file_name+".tex");
     QString marks=QString();
     this->sub_tex_files_edit_lock.lock();
-    if(sub_tex_file.open(QIODevice::ReadOnly|QIODevice::Text)){
-        QTextStream sub_tex_stream(&sub_tex_file);
-        QString sub_tex_content=sub_tex_stream.readAll();
-        sub_tex_file.close();
+    if(file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        QTextStream sub_tex_stream(&file);
+        QString content=sub_tex_stream.readAll();
+        file.close();
         this->sub_tex_files_edit_lock.unlock();
         QRegularExpression get_marks_pattern("\\\\putmarks{([^}]*)}");
-        QRegularExpressionMatchIterator it=get_marks_pattern.globalMatch(sub_tex_content);
+        QRegularExpressionMatchIterator it=get_marks_pattern.globalMatch(content);
         for(int i=0;i<index && it.hasNext();i++)
             it.next();
         if(it.hasNext())
             marks=it.next().captured(1);
         else
-            qDebug()<<"get_marks"<<index;
+            qDebug()<<"get_marks"<<index<<"\t"<<content;
     }else{
         this->sub_tex_files_edit_lock.unlock();
         emit send_error(tr("couldn't open file ")+this->module_dir_path+"/"+file_name+".tex"+tr(" to read marks"));
@@ -63,14 +63,18 @@ QString grader_file_sys::get_marks(QString file_name,int index){
 }
 
 void grader_file_sys::put_marks(QString file_name, QString marks,int index){
-    QFile file(this->module_dir_path+"/"+file_name+".tex");
+    QFile file(this->module_dir_path+"/"+file_name+".tex");   
+    this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex" +tr("for reading marks"));
+        this->sub_tex_files_edit_lock.unlock();
         return ;
     }
+
     QTextStream input(&file);
     QString content=input.readAll();
     file.close();
+    this->sub_tex_files_edit_lock.unlock();
     QRegularExpression pattern;
     QString replacement;
     pattern=QRegularExpression("\\\\putmarks{[^}]*}");
@@ -80,7 +84,7 @@ void grader_file_sys::put_marks(QString file_name, QString marks,int index){
     for(int i=0;i<index&&it.hasNext();i++)
         it.next();
     if(!it.hasNext())
-        qDebug()<<"put_marks"<<index;
+        qDebug()<<"put_marks"<<index<<"\t"<<content;
     QRegularExpressionMatch match=it.next();
     int match_start,match_length;
     match_start=match.capturedStart(0);
@@ -101,13 +105,17 @@ void grader_file_sys::put_marks(QString file_name, QString marks,int index){
 
 void grader_file_sys::put_comment(QString file_name, QString comment,QString comment_pos,int index){
     QFile file(this->module_dir_path+"/"+file_name+".tex");
+    this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
+        this->sub_tex_files_edit_lock.unlock();
         return ;
     }
+
     QTextStream input(&file);
     QString content=input.readAll();
     file.close();
+    this->sub_tex_files_edit_lock.unlock();
     QRegularExpression pattern;
     QString replacement;
 
@@ -119,7 +127,7 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
     for(int i=0;i<index&&it.hasNext();i++)
         it.next();
     if(!it.hasNext())
-        qDebug()<<"put_comment"<<index;
+        qDebug()<<"put_comment"<<index<<"\t"<<content;
     QRegularExpressionMatch match=it.next();
     int match_start,match_length;
     match_start=match.capturedStart(0);
@@ -141,13 +149,17 @@ void grader_file_sys::put_comment(QString file_name, QString comment,QString com
 
 QString grader_file_sys::get_comment(QString file_name,QString comment_pos,int index){
     QFile file(this->module_dir_path+"/"+file_name+".tex");
+    this->sub_tex_files_edit_lock.lock();
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         emit send_error(tr("couldn't Open ")+this->module_dir_path+"/"+file_name+".tex"+tr("for reading comment"));
+        this->sub_tex_files_edit_lock.unlock();
         return QString();
     }
+
     QTextStream input(&file);
     QString content=input.readAll();
     file.close();
+    this->sub_tex_files_edit_lock.unlock();
     QRegularExpression pattern;
 
     //(?!foo) is negative lookahed
@@ -157,7 +169,7 @@ QString grader_file_sys::get_comment(QString file_name,QString comment_pos,int i
     for(int i=0;i<index&&it.hasNext();i++)
         it.next();
     if(!it.hasNext())
-        qDebug()<<"get_comment"<<index;
+        qDebug()<<"get_comment"<<index<<"\t"<<content;
     return it.next().captured(1);
 }
 
