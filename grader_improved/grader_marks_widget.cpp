@@ -18,6 +18,7 @@
 
 #include <QCheckBox>
 #include <QDebug>
+#include <QDoubleValidator>
 #include <QWidget>
 
 #include "grader_marks_widget.h"
@@ -91,7 +92,7 @@ QString grader_marks_widget::get_marks(){
 void grader_marks_widget::put_marks(QString marks){
     QStringList marks_denominations=marks.split( "+", QString::SkipEmptyParts );
     float marks_value=0;
-    int i=0,j=0;
+    int i=0;
 
     bool wrong_format=false;
     if( marks_denominations.size() != this->marks_check_boxes_list.size() )
