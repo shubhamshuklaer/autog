@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.0.1, 2015-03-04T07:51:47. -->
+<!-- Written by QtCreator 3.1.1, 2015-08-19T20:29:34. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -29,9 +29,12 @@
    <value type="bool" key="EditorConfiguration.ConstrainTooltips">false</value>
    <value type="int" key="EditorConfiguration.IndentSize">4</value>
    <value type="bool" key="EditorConfiguration.KeyboardTooltips">false</value>
+   <value type="int" key="EditorConfiguration.MarginColumn">80</value>
+   <value type="bool" key="EditorConfiguration.MouseHiding">true</value>
    <value type="bool" key="EditorConfiguration.MouseNavigation">true</value>
    <value type="int" key="EditorConfiguration.PaddingMode">1</value>
    <value type="bool" key="EditorConfiguration.ScrollWheelZooming">true</value>
+   <value type="bool" key="EditorConfiguration.ShowMargin">false</value>
    <value type="int" key="EditorConfiguration.SmartBackspaceBehavior">0</value>
    <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
    <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
@@ -53,7 +56,7 @@
   <valuemap type="QVariantMap">
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{bb11ecc4-1228-489b-8655-ab17f79f64e7}</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{a63ff68c-bf3b-4bf7-8f7d-6910532a8a56}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
@@ -227,17 +230,17 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">grader_improved</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">autog</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/media/data/Dropbox/Library/grader_project_improved/grader_improved/grader_improved.pro</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">grader_improved.pro</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">autog.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
-    <value type="bool" key="RunConfiguration.UseCppDebugger">true</value>
-    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseMultiProcess">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
@@ -251,7 +254,7 @@
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.EnvironmentId</variable>
-  <value type="QByteArray">{8b88c682-7d3f-468c-9470-ebcc79f73d2e}</value>
+  <value type="QByteArray">{d3596f47-e5ae-428a-b70c-1ba511dccdac}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
