@@ -9,6 +9,7 @@
 #include <QList>
 #include <QComboBox>
 #include <QLabel>
+#include <QTimer>
 
 namespace Ui {
 class grader_editor;
@@ -31,6 +32,7 @@ public:
     QMutex tex_compile_errors_lock;
     QComboBox *merge_combo_box;
     QLabel *merge_label;
+    QTimer *generate_pdf_timer;
     void put_comment(bool async);
     void put_marks(bool async);
     void generate_pdf(bool async);
@@ -71,9 +73,7 @@ private:
     void load_page_meta_data();
     QString get_comment();
     QString get_marks();
-
-
-
+    void generatePdfTimerTimeout();
 };
 
 #endif // GRADER_EDITOR_H

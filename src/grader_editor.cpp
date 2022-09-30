@@ -85,6 +85,8 @@ grader_editor::grader_editor( QWidget *parent, QString project_path,
     this->current_comment_pos_index=0;
     this->tex_compile_errors=QString();
 
+    this->generate_pdf_timer = new QTimer(this);
+    connect(this->generate_pdf_timer, &QTimer::timeout, this, &grader_editor::generatePdfTimerTimeout);
 
     load_page(true,this->current_index);
 
@@ -187,14 +189,18 @@ void grader_editor::on_open_tex_btn_clicked()
     this->file_sys_interface->open_tex_file(this->files_list[this->current_index]);
 }
 
-void grader_editor::on_marks_text_textChanged(){
+void grader_editor::generatePdfTimerTimeout(){
     generate_pdf( true );
+}
+
+void grader_editor::on_marks_text_textChanged(){
+    this->generate_pdf_timer->start(const_generate_pdf_timer_interval_msecs);
 }
 
 
 void grader_editor::on_comment_text_textChanged()
 {
-    generate_pdf( true );
+    this->generate_pdf_timer->start(const_generate_pdf_timer_interval_msecs);
 }
 
 
@@ -265,6 +271,7 @@ void grader_editor::put_comment( bool async ){
 
 
 void grader_editor::generate_pdf(bool async ){
+    this->generate_pdf_timer->stop();
     QString file_name,marks,comment_text,comment_pos;
     int index=get_merge_index();
 

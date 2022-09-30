@@ -229,6 +229,10 @@ void grader_project_load::load_settings(){
         if(settings_iterator!=settings_dict.end())
             const_tex_compile_timeout=settings_iterator.value().toInt();
 
+	settings_iterator=settings_dict.find("const_generate_pdf_timer_interval_msecs");
+	if(settings_iterator!=settings_dict.end())
+	    const_generate_pdf_timer_interval_msecs=settings_iterator.value().toInt();
+
     }
 
 
@@ -240,6 +244,7 @@ void grader_project_load::load_settings(){
     current_settings+="\"const_build_dir_name is   \""+const_build_dir_name+"\"\n";
     current_settings+="\"latex_compile_command is   \""+latex_compile_command+"\"\n";
     current_settings+="\"const_tex_compile_timeout is   \""+QString::number(const_tex_compile_timeout)+tr(" msecs")+"\"\n";
+    current_settings+="\"const_generate_pdf_timer_interval_msecs is   \""+QString::number(const_generate_pdf_timer_interval_msecs)+tr(" msecs")+"\"\n";
 
     QMessageBox::information(this,tr("Current settings"),current_settings);
 

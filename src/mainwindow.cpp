@@ -31,6 +31,7 @@ QChar settings_delemiter=':';
 QChar const_comment_char='#';
 
 int const_tex_compile_timeout=20000;//in milliseconds
+int const_generate_pdf_timer_interval_msecs=2000;
 
 
 QString const_build_dir_name="build";
@@ -38,7 +39,7 @@ QString const_main_pdf_name="main_pdf";
 QString const_merge_pattern="\\\\setpanenumber{(.*)}";
 QString module_config_file_name=".TexFileSequence.csv";
 QString project_config_file_name=".SubModuleList.csv";
-QString settings_file_name=".Settings.csv";
+QString settings_file_name=".Settings.config";
 QString latex_compile_command=
      "pdflatex -file-line-error -interaction=nonstopmode -output-directory "
                                                           +const_build_dir_name;
