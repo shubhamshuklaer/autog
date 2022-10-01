@@ -8,33 +8,26 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = autog_binary
-target.path = /usr/lib/autog/
+# Copy prefix from env var.
+PREFIX = $$(PREFIX)
+isEmpty(PREFIX){
+ PREFIX = /usr
+}
+
+TARGET = autog
+target.path = $$PREFIX/bin
 INSTALLS += target
 
-data.path = /usr/share/autog/data
+data.path = $$PREFIX/share/autog/data
 data.files += data/COPYING.txt
 data.files += data/icon.png
 INSTALLS += data
 
-shortcutfiles.path = /usr/share/applications/
+shortcutfiles.path = $$PREFIX/share/applications/
 shortcutfiles.files = data/autog.desktop
 INSTALLS += shortcutfiles
 
-starter_script.path= /usr/bin
-starter_script.files= data/autog
-INSTALLS +=starter_script
-
-libfiles.path=/usr/lib/autog/
-libfiles.files +=data/libQt5*
-INSTALLS +=libfiles
-
-platform_plugins.path=/usr/lib/autog/platforms
-platform_plugins.files += data/platforms/*
-INSTALLS +=platform_plugins
-
 TEMPLATE = app
-
 
 SOURCES += main.cpp\
         mainwindow.cpp \

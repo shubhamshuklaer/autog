@@ -1,4 +1,0 @@
-#!/bin/bash
-LD_LIBRARY_PATH=/usr/lib/autog/
-export LD_LIBRARY_PATH
-/usr/lib/autog/autog_binary

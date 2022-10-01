@@ -26,6 +26,8 @@
 #include <QTextStream>
 #include <QThread>
 #include <QUrl>
+#include<QDebug>
+
 
 #include "constants.h"
 #include "grader_file_sys.h"
@@ -205,6 +207,7 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     }
 
     tex_compile_output=process.readAllStandardOutput();
+    qInfo() << tex_compile_output;
 
     QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*|!.*",QRegularExpression::MultilineOption);
 
