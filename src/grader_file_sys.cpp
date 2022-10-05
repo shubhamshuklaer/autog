@@ -187,8 +187,13 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     QProcess process;
     process.setWorkingDirectory(this->module_dir_path);
     this->tex_compile_lock.lock();
-    process.start(latex_compile_command+" "+file_name+".tex");
-    process_success=process.waitForFinished(const_tex_compile_timeout);
+    process.startCommand(latex_compile_command+" "+file_name+".tex");
+    if (!process.waitForStarted(const_tex_compile_timeout)) {
+        process_success = false;
+        error = "Process failed to start";
+    } else {
+        process_success=process.waitForFinished(const_tex_compile_timeout);
+    }
     this->tex_compile_lock.unlock();
     if( ! process_success ){
         error=tr( "Compile command :\n")+latex_compile_command+
@@ -207,7 +212,6 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     }
 
     tex_compile_output=process.readAllStandardOutput();
-    qInfo() << tex_compile_output;
 
     QRegularExpression error_pattern(".+:[0-9]+:.+|^l\\.[0-9]+.*|!.*",QRegularExpression::MultilineOption);
 
@@ -219,14 +223,14 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     }
 
 
-    if( error != NULL ){
+    if( !error.isEmpty() ){
         error=tr( "Compile command :\n")+latex_compile_command+
                 " "+file_name+".tex"+ "\n\n" + tr(" Errors :")+"\n" + error;
     }
 
     emit send_tex_compile_error(error);
 
-    if( error == NULL ){
+    if( error.isEmpty() ){
         if( QFile::exists(this->module_dir_path + "/" +
                           const_build_dir_name + "/" +
                                         const_main_pdf_name + ".pdf" ) ){

@@ -30,7 +30,7 @@ grader_combo_validator::grader_combo_validator(QObject * parent,QAbstractItemMod
     this->data_model=model;
 }
 
-QValidator::State grader_combo_validator::validate(QString &input_text, int &pos) const{
+QValidator::State grader_combo_validator::validate(QString &input_text, int &) const{
     bool acceptable,intermediate;
     int current_item_num,num_items;
     QModelIndex item_index;

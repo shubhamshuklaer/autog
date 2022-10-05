@@ -76,7 +76,7 @@ void grader_project_load::select_project_btn_clicked(){
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
 
-    if( dir_path != NULL ){
+    if( !dir_path.isEmpty() ){
 
         selected_dir=QDir(dir_path);
         project_settings.setValue("previous_path",dir_path);
@@ -192,10 +192,10 @@ void grader_project_load::load_settings(){
 
         while(!settings_file_stream.atEnd()){
             temp_line=settings_file_stream.readLine().trimmed();
-            if(temp_line!=NULL){
+            if(!temp_line.isEmpty()){
                 if(temp_line[0]!=const_comment_char){//ignoring comment lines
                     temp_split=temp_line.split(settings_delemiter);
-                    if( temp_split.size() == 2 && temp_split[1] != NULL)
+                    if( temp_split.size() == 2 && !temp_split[1].isEmpty())
                         settings_dict.insert( temp_split[0].trimmed(), temp_split[1].trimmed() );
                 }
             }
@@ -278,7 +278,7 @@ bool grader_project_load::setup_module(){
     QString temp_line;
     while( ! module_config_file_stream.atEnd() ){
         temp_line=module_config_file_stream.readLine();
-        if( temp_line != NULL ){
+        if( !temp_line.isEmpty() ){
             this->files_list<<temp_line;
         }
     }

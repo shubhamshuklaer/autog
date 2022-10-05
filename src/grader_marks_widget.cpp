@@ -90,7 +90,7 @@ QString grader_marks_widget::get_marks(){
 }
 
 void grader_marks_widget::put_marks(QString marks){
-    QStringList marks_denominations=marks.split( "+", QString::SkipEmptyParts );
+    QStringList marks_denominations=marks.split( "+", Qt::SkipEmptyParts );
     float marks_value=0;
     int i=0;
 

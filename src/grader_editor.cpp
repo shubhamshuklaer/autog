@@ -391,7 +391,7 @@ void grader_editor::load_page(bool start,int index){
         if(!start)
             generate_pdf( false );
         //Will only allow him to go ahed if this page is free of errors
-        if(this->tex_compile_errors!=NULL && !start ){
+        if(!this->tex_compile_errors.isEmpty() && !start ){
             this->ui->file_name_combo->setCurrentIndex(this->current_index);
             display_error( tr( "Please fix all errors before proceding" ) );
         }else{
