@@ -1,0 +1,128 @@
+# Taking inspiration from https://github.com/keshavbhatt/whatsie/blob/main/snap/snapcraft.yaml
+# Using content snap https://github.com/keshavbhatt/qt515-core20
+name: autog # you probably want to 'snapcraft register <name>'
+base: core20 # the base snap is the execution environment for this snap
+version: '0.10.1' # just for humans, typically '1.2+git' or '1.3.2'
+summary: A interface for the computerized grading system developed by my teacher # 79 char long summary
+license: GPL-3.0
+description: |
+  Autog is aimed at increasing the productivity of the grader.
+  It takes Latex(with scanned answer page embedded inside) as input
+  and provides the user with a nice interface to put comments and marks.
+  It updates the Latex with the user input, compiles it and displays the
+  output PDF live. It is a part of a whole system of computerized grading
+  used in Mathematics Department, IITG. Special answer sheets are used were
+  students write the answers in designated places. Each page has a code that
+  uniquely identifies the page number as well as the identity of the student
+  whose answer sheet it is. All the pages are scanned and then the grading
+  workload is distributed to the TAs through some scripts. Then the grading
+  happens through Autog. After grading, some scripts compile all the results
+  and enable students to access their graded answer sheets online.
+compression: lzo # https://snapcraft.io/docs/snapcraft-top-level-metadata#heading--compression
+source-code: https://github.com/shubhamshuklaer/autog
+icon: src/data/icon.png
+architectures:
+  - build-on: amd64
+    run-on: amd64
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+environment:
+  SNAP_DESKTOP_RUNTIME: $SNAP/qt515-core20
+  TEXMFROOT: $SNAP/usr/share/texlive
+  TEXMFDEBIAN: $SNAP/usr/share/texmf
+  TEXMFLOCAL: $SNAP/usr/local/share/texmf
+  TEXMFSYSVAR: $SNAP/var/lib/texmf
+  TEXMFSYSCONFIG: $SNAP/etc/texmf
+  PERL5LIB: $SNAP/usr/share/perl/5.30.0:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30.0
+
+# The default version available in ubuntu 20.04 is 5.12.
+package-repositories:
+  - type: apt
+    formats: [deb]
+    components: [main]
+    suites: [focal]
+    key-id: C65D51784EDC19A871DBDBB710C56D0DE9977759
+    url: https://ppa.launchpadcontent.net/beineri/opt-qt-5.15.4-focal/ubuntu
+
+apps:
+  autog:
+    command: bin/desktop-launch $SNAP/usr/bin/autog
+    environment:
+       IS_SNAP: 1
+       XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
+       LANG: en_US.UTF-8 # issue 7,21
+       QT_QPA_PLATFORMTHEME: gtk3
+       NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
+    desktop: usr/share/applications/autog.desktop
+    plugs:
+      - desktop
+      - desktop-legacy
+      - gsettings
+      - removable-media
+      - home
+      - opengl
+      - unity7
+      - unity8
+      - x11
+      - wayland
+      - network
+      - desktop-launch
+      - dbus
+
+plugs:
+  gsettings:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+  qt515-core20:
+    interface: content
+    target: $SNAP/qt515-core20
+    default-provider: qt515-core20
+
+parts:
+  autog-build-src:
+    # See 'snapcraft plugins'
+    plugin: qmake
+    source: https://github.com/shubhamshuklaer/autog.git
+    source-subdir: src
+    build-packages: [build-essential, qt515base, qt515tools, libgl1-mesa-dev]
+    build-environment:
+      - QT_BASE_DIR: /opt/qt515
+      - QTDIR: $QT_BASE_DIR
+      - PATH: $QT_BASE_DIR/bin:$PATH
+      - LD_LIBRARY_PATH: $QT_BASE_DIR/lib/$SNAPCRAFT_ARCH_TRIPLET:$QT_BASE_DIR/lib:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      - PKG_CONFIG_PATH: $QT_BASE_DIR/lib/pkgconfig:${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+        #- PREFIX: ${SNAPCRAFT_PART_INSTALL}/usr
+    stage-packages: [texlive-full, evince, perl-modules-5.30]
+    override-stage: |
+      # fmtutil-sys --all
+      #mktexfmt pdflatex.fmt
+      snapcraftctl stage
+      export TEXMFROOT=$SNAPCRAFT_STAGE/usr/share/texlive
+      export TEXMFDEBIAN=$SNAPCRAFT_STAGE/usr/share/texmf
+      export TEXMFLOCAL=$SNAPCRAFT_STAGE/usr/local/share/texmf
+      export TEXMFSYSVAR=$SNAPCRAFT_STAGE/var/lib/texmf
+      export TEXMFSYSCONFIG=$SNAPCRAFT_STAGE/etc/texmf
+      export PERL5LIB=$SNAPCRAFT_STAGE/usr/share/perl/5.30.0:$SNAPCRAFT_STAGE/usr/lib/x86_64-linux-gnu/perl/5.30.0
+      mktexfmt pdflatex.fmt     
+    #stage:
+    #  - usr/**
+  desktop-launch:
+     plugin: nil
+     source: https://github.com/keshavbhatt/qt515-core20.git
+     after: [autog-build-src]
+     override-build: |
+       snapcraftctl build
+       mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin/
+       cp -rf ${SNAPCRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${SNAPCRAFT_PART_INSTALL}/bin/
