@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QDoubleValidator>
 #include <QWidget>
+#include <QtGlobal>
 
 #include "grader_marks_widget.h"
 #include "ui_grader_marks_widget.h"
@@ -90,7 +91,11 @@ QString grader_marks_widget::get_marks(){
 }
 
 void grader_marks_widget::put_marks(QString marks){
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    QStringList marks_denominations=marks.split( "+", QString::SkipEmptyParts );
+#else
     QStringList marks_denominations=marks.split( "+", Qt::SkipEmptyParts );
+#endif
     float marks_value=0;
     int i=0;
 

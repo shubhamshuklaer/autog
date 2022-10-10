@@ -27,6 +27,7 @@
 #include <QThread>
 #include <QUrl>
 #include<QDebug>
+#include <QtGlobal>
 
 
 #include "constants.h"
@@ -187,6 +188,10 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     QProcess process;
     process.setWorkingDirectory(this->module_dir_path);
     this->tex_compile_lock.lock();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    process.start(latex_compile_command+" "+file_name+".tex");
+    process_success=process.waitForFinished(const_tex_compile_timeout);
+#else
     process.startCommand(latex_compile_command+" "+file_name+".tex");
     if (!process.waitForStarted(const_tex_compile_timeout)) {
         process_success = false;
@@ -194,6 +199,7 @@ QString grader_file_sys::generate_pdf(QString file_name,QString marks,QString co
     } else {
         process_success=process.waitForFinished(const_tex_compile_timeout);
     }
+#endif
     this->tex_compile_lock.unlock();
     if( ! process_success ){
         error=tr( "Compile command :\n")+latex_compile_command+
