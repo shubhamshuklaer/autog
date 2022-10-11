@@ -2,6 +2,9 @@
 
 # ./make_package.sh autog-VERSION UBUNTU_VERSION ARCHITECTURE
 # ./make_package.sh autog-0.9.27 focal amd64
+# Note that if you are generating packages for different UBUNTU_VERSIONs,
+# the VERSION should also be different. Otherwise during publish launchpad
+# complains that the version already exists.
 
 set -x
 set -e
