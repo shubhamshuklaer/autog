@@ -40,9 +40,19 @@ cd debian
 rm *ex *EX README* control copyright rules compat || true
 cp ../../../control ../../../copyright ../../../rules ../../../compat .
 chmod +x rules
-sed -i "1 s/unstable/$2/" "changelog" #1 only replaces the first line
+sed -i "1 s/unstable\|UNRELEASED/$2/" "changelog" #1 only replaces the first line
 sed -i "s/^Architecture.*/Architecture: $3/" "control"
+if [ "$2" = "focal" ]
+then
+	sed -i "s/qt6-declarative-dev/qtdeclarative5-dev/" "control"
+fi
 
 cd ..
 
-debuild -S
+qtVersion="-qt=6"
+if [ "$2" = "focal" ]
+then
+	qtVersion="-qt=5"
+fi
+
+debuild -e "DEB_QMAKE_ARGS=$qtVersion" -S

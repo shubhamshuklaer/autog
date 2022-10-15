@@ -2,7 +2,7 @@ Source: autog
 Section: utils
 Priority: optional
 Maintainer: Shubham Shukla (Student) <shubhamshuklaerssss@gmail.com>
-Build-Depends: qtdeclarative5-dev, cdbs
+Build-Depends: qt6-declarative-dev, cdbs
 Standards-Version: 3.9.5
 Homepage: 
 #Vcs-Git: git://git.debian.org/collab-maint/autog.git
@@ -10,5 +10,5 @@ Homepage:
 
 Package: autog
 Architecture: any
-Depends: qtbase5-dev, qtdeclarative5-dev, qtdeclarative5-dev-tools, qt5-gtk-platformtheme, libc6 (>= 2.15), libfontconfig1 (>= 2.9.0), libfreetype6 (>= 2.3.5), libgcc1 (>= 1:4.1.1), libgl1-mesa-glx | libgl1, libglib2.0-0 (>= 2.22.0), libice6 (>= 1:1.0.0), libicu66 | libicu70, libpng16-16, libsm6, libstdc++6 (>= 4.1.1), libx11-6, libx11-xcb1, libxcb-glx0, libxcb-icccm4 (>= 0.4.1), libxcb-image0 (>= 0.3.9), libxcb-keysyms1 (>= 0.3.9), libxcb-randr0 (>= 1.3), libxcb-render-util0 (>= 0.3.8), libxcb-render0, libxcb-shape0, libxcb-shm0, libxcb-sync1, libxcb-xfixes0, libxcb-xkb1, libxcb1, libxi6 (>= 2:1.2.99.4), libxkbcommon-x11-0 (>= 0.4.0), libxkbcommon0 (>= 0.4.1), libxrender1, zlib1g (>= 1:1.1.4)
+Depends: qt6-declarative-dev, libc6 (>= 2.15), libfontconfig1 (>= 2.9.0), libfreetype6 (>= 2.3.5), libgcc1 (>= 1:4.1.1), libgl1-mesa-glx | libgl1, libglib2.0-0 (>= 2.22.0), libice6 (>= 1:1.0.0), libicu66 | libicu70, libpng16-16, libsm6, libstdc++6 (>= 4.1.1), libx11-6, libx11-xcb1, libxcb-glx0, libxcb-icccm4 (>= 0.4.1), libxcb-image0 (>= 0.3.9), libxcb-keysyms1 (>= 0.3.9), libxcb-randr0 (>= 1.3), libxcb-render-util0 (>= 0.3.8), libxcb-render0, libxcb-shape0, libxcb-shm0, libxcb-sync1, libxcb-xfixes0, libxcb-xkb1, libxcb1, libxi6 (>= 2:1.2.99.4), libxkbcommon-x11-0 (>= 0.4.0), libxkbcommon0 (>= 0.4.1), libxrender1, zlib1g (>= 1:1.1.4)
 Description: A interface for the computerized grading system developed by my teacher
